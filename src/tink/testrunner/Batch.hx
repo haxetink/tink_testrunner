@@ -2,9 +2,13 @@ package tink.testrunner;
 
 @:forward
 abstract Batch(BatchObject) from BatchObject to BatchObject {
+	
+	public inline function new(info, suites)
+		this = new BatchObject(info, suites);
+	
 	@:from
 	public static inline function ofSuites<T:Suite>(suites:Array<T>):Batch
-		return new BatchObject({}, cast suites);
+		return new Batch({}, cast suites);
 		
 	@:from
 	public static inline function ofSuite(suite:Suite):Batch
