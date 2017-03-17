@@ -71,11 +71,9 @@ class Runner {
 		return Future.async(function(cb) {
 			reporter.report(CaseStart(caze.info)).handle(function(_) {
 				
-				var timeout = caze.info != null && caze.info.timeout != null ? caze.info.timeout : 5000;
-				
-				before.run().timeout(timeout, timers)
-					.next(function(_) return caze.execute().collect().timeout(timeout, timers))
-					.next(function(result) return after.run().timeout(timeout, timers).next(function(_) return result))
+				before.run().timeout(caze.timeout, timers)
+					.next(function(_) return caze.execute().collect().timeout(caze.timeout, timers))
+					.next(function(result) return after.run().timeout(caze.timeout, timers).next(function(_) return result))
 					.map(function(o) return switch o {
 						case Success(assertions): assertions;
 						case Failure(e): [Failure(e)];

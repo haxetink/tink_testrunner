@@ -10,19 +10,17 @@ interface Case {
 
 typedef CaseInfo = {
 	description:String,
-	timeout:Null<Int>, // ms
 }
 
 class BasicCase implements Case {
 	public var info:CaseInfo;
-	public var timeout:Int = 0;
+	public var timeout:Int = 5000;
 	public var include:Bool = false;
 	public var exclude:Bool = false;
 	
 	public function new() {
 		info = {
 			description: Type.getClassName(Type.getClass(this)),
-			timeout: 5000,
 		}
 	}
 	
