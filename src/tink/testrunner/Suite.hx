@@ -24,6 +24,10 @@ abstract Suite(SuiteObject) from SuiteObject to SuiteObject {
 interface SuiteObject {
 	var info:SuiteInfo;
 	var cases:Array<Case>;
+	var startup:Services;
+	var before:Services;
+	var after:Services;
+	var shutdown:Services;
 }
 
 typedef SuiteInfo = {
@@ -31,30 +35,20 @@ typedef SuiteInfo = {
 }
 
 
-@:forward
-abstract Services(Array<Service>) from Array<Service> to Array<Service> {
-	public function run():Promise<Noise> {
-		return Future.async(function(cb) {
-			var iter = this.iterator();
-			function next() {
-				if(iter.hasNext())
-					iter.next()().handle(function(o) if(o.isSuccess()) next() else cb(o));
-				else
-					cb(Success(Noise));
-			}
-			next();
-		});
-	}
-}
-
-typedef Service = Void->Promise<Noise>;
-
 class BasicSuite implements SuiteObject {
 	public var info:SuiteInfo;
 	public var cases:Array<Case>;
+	public var startup:Services;
+	public var before:Services;
+	public var after:Services;
+	public var shutdown:Services;
 	
-	public function new(info, cases) {
+	public function new(info, cases, ?startup, ?before, ?after, ?shutdown) {
 		this.info = info;
 		this.cases = cases;
+		this.startup = startup != null ? startup : [];
+		this.before = before != null ? before : [];
+		this.after = after != null ? after : [];
+		this.shutdown = shutdown != null ? shutdown : [];
 	}
 }

@@ -2,6 +2,9 @@ package tink.testrunner;
 
 interface Case {
 	var info:CaseInfo;
+	var timeout:Int;
+	var include:Bool;
+	var exclude:Bool;
 	function execute():Assertions;
 }
 
@@ -12,6 +15,9 @@ typedef CaseInfo = {
 
 class BasicCase implements Case {
 	public var info:CaseInfo;
+	public var timeout:Int = 0;
+	public var include:Bool = false;
+	public var exclude:Bool = false;
 	
 	public function new() {
 		info = {

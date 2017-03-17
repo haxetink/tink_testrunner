@@ -4,6 +4,7 @@ import tink.testrunner.Case;
 import tink.testrunner.Suite;
 import tink.testrunner.Reporter;
 import tink.testrunner.Timer;
+import tink.testrunner.Services;
 
 using tink.CoreApi;
 
@@ -41,60 +42,77 @@ class Runner {
 	static function runSuite(suite:Suite, reporter:Reporter, timers:TimerManager):Future<SuiteResult> {
 		return Future.async(function(cb) {
 			reporter.report(SuiteStart(suite.info)).handle(function(_) {
-				var iter = suite.cases.iterator();
-				var results = [];
-				function next() {
-					if(iter.hasNext()) {
-						var caze = iter.next();
-						runCase(caze, reporter, timers).handle(function(r) {
-							results.push(r);
-							next();
-						});
-					} else {
-						cb({
-							info: suite.info,
-							cases: results,
-						});
+				var includeMode = false;
+				for(c in suite.cases) {
+					if(c.include) {
+						includeMode = true;
+						break;
 					}
 				}
 				
-				next();
+				var cases = suite.cases.filter(function(c) return !c.exclude && (!includeMode || c.include));
+				if(cases.length > 0) {
+					var iter = cases.iterator();
+					var results = [];
+					function next() {
+						if(iter.hasNext()) {
+							var caze = iter.next();
+							runCase(caze, suite.before, suite.after, reporter, timers).handle(function(r) {
+								results.push(r);
+								next();
+							});
+						} else {
+							suite.shutdown.run().handle(cb.bind({info: suite.info, cases: results}));
+						}
+					}
+					suite.startup.run().handle(next);
+					
+				} else {
+					cb({info: suite.info, cases: []});
+				}
 			});
 		});
 	}
 	
-	static function runCase(caze:Case, reporter:Reporter, timers:TimerManager):Future<CaseResult> {
+	static function runCase(caze:Case, before:Services, after:Services, reporter:Reporter, timers:TimerManager):Future<CaseResult> {
 		return Future.async(function(cb) {
 			reporter.report(CaseStart(caze.info)).handle(function(_) {
 				
-				function complete(assertions) {
-					var results = {
-						info: caze.info,
-						results: assertions,
-					}
-					reporter.report(CaseFinish(results)).handle(function(_) cb(results));
-				}
+				var timeout = caze.info != null && caze.info.timeout != null ? caze.info.timeout : 5000;
 				
-				var done = false;
-				var timer = null;
-				var link = caze.execute().collect().handle(function(o) {
-					done = true;
-					if(timer != null) timer.stop();
-					complete(switch o {
+				runWithTimeout(timeout, before.run, timers)
+					.next(function(_) return runWithTimeout(timeout, caze.execute().collect, timers))
+					.next(function(result) return runWithTimeout(timeout, after.run, timers).next(function(_) return result))
+					.map(function(o) return switch o {
 						case Success(assertions): assertions;
 						case Failure(e): [Failure(e)];
+					})
+					.handle(function(o) {
+						var results = {
+							info: caze.info,
+							results: o,
+						}
+						reporter.report(CaseFinish(results)).handle(function(_) cb(results));
 					});
-				});
-				
-				
-				if(!done && timers != null) {
-					var timeout = caze.info != null && caze.info.timeout != null ? caze.info.timeout : 5000;
-					timer = timers.schedule(timeout, function() {
-						link.dissolve();
-						complete([Failure(new Error('Timed out after $timeout ms'))]);
-					});
-				}
 			});
+		});
+	}
+	
+	static function runWithTimeout<T>(timeout:Int, f:Void->Promise<T>, timers:TimerManager):Promise<T> {
+		return Future.async(function(cb) {
+			var done = false;
+			var timer = null;
+			var link = f().handle(function(o) {
+				done = true;
+				if(timer != null) timer.stop();
+				cb(o);
+			});
+			if(!done && timers != null) {
+				timer = timers.schedule(timeout, function() {
+					link.dissolve();
+					cb(Failure(new Error('Timed out after $timeout ms')));
+				});
+			}
 		});
 	}
 }
