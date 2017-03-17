@@ -56,7 +56,7 @@ class Suite {
 
 A Batch is a colllection of Suites.
 
-This time it is really just `Array<Batch>`.
+This time it is really just `Array<Suite>`.
 
 ### Runner
 
