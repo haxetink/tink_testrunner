@@ -1,14 +1,16 @@
 package tink.testrunner;
 
 @:forward
-abstract Batch(BatchObject) from BatchObject to BatchObject {
+abstract Batch(Array<Suite>) from Array<Suite> to Array<Suite> {
 	
-	public inline function new(info, suites)
-		this = new BatchObject(info, suites);
+	public var suites(get, never):Array<Suite>;
+	
+	public inline function new(suites:Array<Suite>)
+		this = suites;
 	
 	@:from
 	public static inline function ofSuites<T:Suite>(suites:Array<T>):Batch
-		return new Batch({}, cast suites);
+		return new Batch(cast suites);
 		
 	@:from
 	public static inline function ofSuite(suite:Suite):Batch
@@ -21,24 +23,13 @@ abstract Batch(BatchObject) from BatchObject to BatchObject {
 	@:from
 	public static inline function ofCase(caze:Case):Batch
 		return ofCases([caze]);
-}
-
-typedef BatchInfo = {
-	
-}
-
-class BatchObject {
-	public var info:BatchInfo;
-	public var suites:Array<Suite>;
-	
-	public function new(info, suites) {
-		this.info = info;
-		this.suites = suites;
-	}
-	
+		
 	@:allow(tink.testrunner)
 	function includeMode() {
-		for(s in suites) if(s.includeMode()) return true;
+		for(s in this) if(s.includeMode()) return true;
 		return false;
 	}
+		
+	inline function get_suites()
+		return this;
 }
