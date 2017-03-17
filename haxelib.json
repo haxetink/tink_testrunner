@@ -1,0 +1,16 @@
+{
+  "name": "tink_testrunner",
+  "license": "MIT",
+  "tags": [],
+  "classPath": "src",
+  "contributors": [
+    "kevinresol"
+  ],
+  "releasenote": "initial release",
+  "version": "0.0.0",
+  "url": "https://github.com/kevinresol/tink_testrunner/",
+  "dependencies": {
+    "tink_streams": "",
+    "tink_macro": ""
+  }
+}
