@@ -4,7 +4,7 @@ import tink.testrunner.Case;
 import tink.testrunner.Suite;
 import tink.testrunner.Reporter;
 import tink.testrunner.Timer;
-import tink.testrunner.Services;
+import tink.testrunner.Service;
 
 using tink.testrunner.Runner.TimeoutHelper;
 using tink.CoreApi;
@@ -67,7 +67,7 @@ class Runner {
 		});
 	}
 	
-	static function runCase(caze:Case, before:Services, after:Services, reporter:Reporter, timers:TimerManager):Future<CaseResult> {
+	static function runCase(caze:Case, before:Service, after:Service, reporter:Reporter, timers:TimerManager):Future<CaseResult> {
 		return Future.async(function(cb) {
 			reporter.report(CaseStart(caze.info)).handle(function(_) {
 				

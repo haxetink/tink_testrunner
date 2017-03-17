@@ -28,18 +28,18 @@ typedef SuiteInfo = {
 class SuiteObject {
 	public var info:SuiteInfo;
 	public var cases:Array<Case>;
-	public var startup:Services;
-	public var before:Services;
-	public var after:Services;
-	public var shutdown:Services;
+	public var startup:Service;
+	public var before:Service;
+	public var after:Service;
+	public var shutdown:Service;
 	
 	public function new(info, cases, ?startup, ?before, ?after, ?shutdown) {
 		this.info = info;
 		this.cases = cases;
-		this.startup = startup != null ? startup : [];
-		this.before = before != null ? before : [];
-		this.after = after != null ? after : [];
-		this.shutdown = shutdown != null ? shutdown : [];
+		this.startup = startup != null ? startup : Service.dummy;
+		this.before = before != null ? before : Service.dummy;
+		this.after = after != null ? after : Service.dummy;
+		this.shutdown = shutdown != null ? shutdown : Service.dummy;
 	}
 	
 	@:allow(tink.testrunner)
