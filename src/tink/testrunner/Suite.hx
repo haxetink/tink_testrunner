@@ -42,7 +42,8 @@ class SuiteObject {
 		this.shutdown = shutdown != null ? shutdown : [];
 	}
 	
-	public function includeMode() {
+	@:allow(tink.testrunner)
+	function includeMode() {
 		for(c in cases) if(c.include) return true;
 		return false;
 	}

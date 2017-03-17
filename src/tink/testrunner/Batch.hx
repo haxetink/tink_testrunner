@@ -36,7 +36,8 @@ class BatchObject {
 		this.suites = suites;
 	}
 	
-	public function includeMode() {
+	@:allow(tink.testrunner)
+	function includeMode() {
 		for(s in suites) if(s.includeMode()) return true;
 		return false;
 	}
