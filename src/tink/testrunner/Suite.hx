@@ -9,7 +9,7 @@ abstract Suite(SuiteObject) from SuiteObject to SuiteObject {
 	
 	@:from
 	public static inline function ofCases<T:Case>(cases:Array<T>):Suite
-		return new BasicSuite({
+		return new SuiteObject({
 			name: [for(c in cases) switch Type.getClass(c) {
 				case null: null;
 				case c: Type.getClassName(c);
@@ -21,21 +21,11 @@ abstract Suite(SuiteObject) from SuiteObject to SuiteObject {
 		return ofCases([caze]);
 }
 
-interface SuiteObject {
-	var info:SuiteInfo;
-	var cases:Array<Case>;
-	var startup:Services;
-	var before:Services;
-	var after:Services;
-	var shutdown:Services;
-}
-
 typedef SuiteInfo = {
 	name:String,
 }
 
-
-class BasicSuite implements SuiteObject {
+class SuiteObject {
 	public var info:SuiteInfo;
 	public var cases:Array<Case>;
 	public var startup:Services;
@@ -50,5 +40,10 @@ class BasicSuite implements SuiteObject {
 		this.before = before != null ? before : [];
 		this.after = after != null ? after : [];
 		this.shutdown = shutdown != null ? shutdown : [];
+	}
+	
+	public function includeMode() {
+		for(c in cases) if(c.include) return true;
+		return false;
 	}
 }

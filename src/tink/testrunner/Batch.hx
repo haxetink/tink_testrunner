@@ -4,7 +4,7 @@ package tink.testrunner;
 abstract Batch(BatchObject) from BatchObject to BatchObject {
 	@:from
 	public static inline function ofSuites<T:Suite>(suites:Array<T>):Batch
-		return new BasicBatch({}, cast suites);
+		return new BatchObject({}, cast suites);
 		
 	@:from
 	public static inline function ofSuite(suite:Suite):Batch
@@ -19,21 +19,21 @@ abstract Batch(BatchObject) from BatchObject to BatchObject {
 		return ofCases([caze]);
 }
 
-interface BatchObject {
-	var info:BatchInfo;
-	var suites:Array<Suite>;
-}
-
 typedef BatchInfo = {
 	
 }
 
-class BasicBatch implements BatchObject {
+class BatchObject {
 	public var info:BatchInfo;
 	public var suites:Array<Suite>;
 	
 	public function new(info, suites) {
 		this.info = info;
 		this.suites = suites;
+	}
+	
+	public function includeMode() {
+		for(s in suites) if(s.includeMode()) return true;
+		return false;
 	}
 }

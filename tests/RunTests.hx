@@ -13,9 +13,11 @@ class RunTests {
 		
 		var code = 0;
 		
-		function oops(?pos:haxe.PosInfos) {
-			trace(pos);
-			code++;
+		function assertEquals<T>(expected:T, actual:T, ?pos:haxe.PosInfos) {
+			if(expected != actual) {
+				println('${pos.fileName}:${pos.lineNumber}: Expected $expected but got $actual ');
+				code++;
+			}
 		}
 		
 		var futures = [];
@@ -24,7 +26,7 @@ class RunTests {
 		var single = new SingleCase();
 		futures.push(
 			function() return Runner.run(single).map(function(result) {
-				code += result.errors().length;
+				assertEquals(0, result.errors().length);
 				return Noise;
 			})
 		);
@@ -32,7 +34,7 @@ class RunTests {
 		// Test: cast from multiple cases
 		futures.push(
 			function() return Runner.run([single, single]).map(function(result) {
-				code += result.errors().length;
+				assertEquals(0, result.errors().length);
 				return Noise;
 			})
 		);

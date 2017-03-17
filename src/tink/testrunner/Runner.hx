@@ -25,7 +25,7 @@ class Runner {
 				function next() {
 					if(iter.hasNext()) {
 						var suite = iter.next();
-						runSuite(suite, reporter, timers).handle(function(o) {
+						runSuite(suite, reporter, timers, batch.includeMode()).handle(function(o) {
 							results.push(o);
 							reporter.report(SuiteFinish(o)).handle(next);
 						});
@@ -39,17 +39,9 @@ class Runner {
 	}
 	
 	
-	static function runSuite(suite:Suite, reporter:Reporter, timers:TimerManager):Future<SuiteResult> {
+	static function runSuite(suite:Suite, reporter:Reporter, timers:TimerManager, includeMode:Bool):Future<SuiteResult> {
 		return Future.async(function(cb) {
 			reporter.report(SuiteStart(suite.info)).handle(function(_) {
-				var includeMode = false;
-				for(c in suite.cases) {
-					if(c.include) {
-						includeMode = true;
-						break;
-					}
-				}
-				
 				var cases = suite.cases.filter(function(c) return !c.exclude && (!includeMode || c.include));
 				if(cases.length > 0) {
 					var iter = cases.iterator();
