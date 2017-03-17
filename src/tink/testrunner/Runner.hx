@@ -6,6 +6,7 @@ import tink.testrunner.Reporter;
 import tink.testrunner.Timer;
 import tink.testrunner.Services;
 
+using tink.testrunner.Runner.TimeoutHelper;
 using tink.CoreApi;
 
 class Runner {
@@ -72,9 +73,9 @@ class Runner {
 				
 				var timeout = caze.info != null && caze.info.timeout != null ? caze.info.timeout : 5000;
 				
-				runWithTimeout(timeout, before.run, timers)
-					.next(function(_) return runWithTimeout(timeout, caze.execute().collect, timers))
-					.next(function(result) return runWithTimeout(timeout, after.run, timers).next(function(_) return result))
+				before.run().timeout(timeout, timers)
+					.next(function(_) return caze.execute().collect().timeout(timeout, timers))
+					.next(function(result) return after.run().timeout(timeout, timers).next(function(_) return result))
 					.map(function(o) return switch o {
 						case Success(assertions): assertions;
 						case Failure(e): [Failure(e)];
@@ -90,19 +91,22 @@ class Runner {
 		});
 	}
 	
-	static function runWithTimeout<T>(timeout:Int, f:Void->Promise<T>, timers:TimerManager):Promise<T> {
+}
+
+class TimeoutHelper {
+	public static function timeout<T>(promise:Promise<T>, ms:Int, timers:TimerManager):Promise<T> {
 		return Future.async(function(cb) {
 			var done = false;
 			var timer = null;
-			var link = f().handle(function(o) {
+			var link = promise.handle(function(o) {
 				done = true;
 				if(timer != null) timer.stop();
 				cb(o);
 			});
 			if(!done && timers != null) {
-				timer = timers.schedule(timeout, function() {
+				timer = timers.schedule(ms, function() {
 					link.dissolve();
-					cb(Failure(new Error('Timed out after $timeout ms')));
+					cb(Failure(new Error('Timed out after $ms ms')));
 				});
 			}
 		});
