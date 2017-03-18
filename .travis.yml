@@ -31,7 +31,7 @@ script:
   # - haxelib run travix flash
   # - haxelib run travix java # bug with hxjava's type parameters handling
   - haxelib run travix cpp
-  # - haxelib run travix cs # to be investigated
+  - haxelib run travix cs
   - haxelib run travix php
   - haxelib run travix lua
   
