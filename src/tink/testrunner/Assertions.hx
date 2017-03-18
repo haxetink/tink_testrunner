@@ -10,23 +10,16 @@ using tink.CoreApi;
 abstract Assertions(Stream<Assertion>) from Stream<Assertion> to Stream<Assertion> {
 	@:from
 	public static inline function ofAssertion(o:Assertion):Assertions {
-		var buffer = new AssertionBuffer();
-		buffer.add(o);
-		return buffer.complete();
+		return [o].iterator();
 	}
 	
 	@:from
-	public static inline function ofFutureAssertion(p:Future<Assertion>):Assertions {
-		var buffer = new AssertionBuffer();
-		p.handle(function(o) {
-			buffer.add(o);
-			buffer.complete();
-		});
-		return buffer;
+	public static function ofFutureAssertion(p:Future<Assertion>):Assertions {
+		return p.map(function(a) return Success(ofAssertion(a)));
 	}
 	
 	@:from
-	public static inline function ofSurpriseAssertion(p:Surprise<Assertion, Error>):Assertions {
+	public static function ofSurpriseAssertion(p:Surprise<Assertion, Error>):Assertions {
 		return p >> function(o:Assertion) return ofAssertion(o);
 	}
 	
