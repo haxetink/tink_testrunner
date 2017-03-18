@@ -7,8 +7,8 @@
     "kevinresol"
   ],
   "releasenote": "initial release",
-  "version": "0.0.0",
-  "url": "https://github.com/kevinresol/tink_testrunner/",
+  "version": "0.1.0",
+  "url": "https://github.com/haxetink/tink_testrunner/",
   "dependencies": {
     "tink_streams": "",
     "tink_macro": ""
