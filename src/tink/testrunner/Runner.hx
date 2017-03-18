@@ -4,7 +4,6 @@ import tink.testrunner.Case;
 import tink.testrunner.Suite;
 import tink.testrunner.Reporter;
 import tink.testrunner.Timer;
-import tink.testrunner.Service;
 
 using tink.testrunner.Runner.TimeoutHelper;
 using tink.CoreApi;
@@ -50,15 +49,15 @@ class Runner {
 					function next() {
 						if(iter.hasNext()) {
 							var caze = iter.next();
-							runCase(caze, suite.before, suite.after, reporter, timers).handle(function(r) {
+							runCase(caze, suite, reporter, timers).handle(function(r) {
 								results.push(r);
 								next();
 							});
 						} else {
-							suite.shutdown.run().handle(cb.bind({info: suite.info, cases: results}));
+							suite.shutdown().handle(cb.bind({info: suite.info, cases: results}));
 						}
 					}
-					suite.startup.run().handle(next);
+					suite.startup().handle(next);
 					
 				} else {
 					cb({info: suite.info, cases: []});
@@ -67,13 +66,13 @@ class Runner {
 		});
 	}
 	
-	static function runCase(caze:Case, before:Service, after:Service, reporter:Reporter, timers:TimerManager):Future<CaseResult> {
+	static function runCase(caze:Case, suite:Suite, reporter:Reporter, timers:TimerManager):Future<CaseResult> {
 		return Future.async(function(cb) {
 			reporter.report(CaseStart(caze.info)).handle(function(_) {
 				
-				before.run().timeout(caze.timeout, timers)
+				suite.before().timeout(caze.timeout, timers)
 					.next(function(_) return caze.execute().collect().timeout(caze.timeout, timers))
-					.next(function(result) return after.run().timeout(caze.timeout, timers).next(function(_) return result))
+					.next(function(result) return suite.after().timeout(caze.timeout, timers).next(function(_) return result))
 					.map(function(o) return switch o {
 						case Success(assertions): assertions;
 						case Failure(e): [Failure(e)];

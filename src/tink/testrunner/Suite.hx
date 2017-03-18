@@ -26,21 +26,20 @@ typedef SuiteInfo = {
 }
 
 class SuiteObject {
+	static var STUB:Promise<Noise> = Future.sync(Success(Noise));
+	
 	public var info:SuiteInfo;
 	public var cases:Array<Case>;
-	public var startup:Service;
-	public var before:Service;
-	public var after:Service;
-	public var shutdown:Service;
 	
-	public function new(info, cases, ?startup, ?before, ?after, ?shutdown) {
+	public function new(info, cases) {
 		this.info = info;
 		this.cases = cases;
-		this.startup = startup != null ? startup : Service.dummy;
-		this.before = before != null ? before : Service.dummy;
-		this.after = after != null ? after : Service.dummy;
-		this.shutdown = shutdown != null ? shutdown : Service.dummy;
 	}
+	
+	public function startup() return STUB;
+	public function before() return STUB;
+	public function after() return STUB;
+	public function shutdown() return STUB;
 	
 	@:allow(tink.testrunner)
 	function includeMode() {
