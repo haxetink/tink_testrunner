@@ -45,10 +45,10 @@ so the actual implementation looks like this:
 class Suite {
 	public var info:SuiteInfo; // meta info
 	public var cases:Array<Case>;
-	public var startup:Void->Promise<Noise>; // to be run once before all cases
-	public var before:Void->Promise<Noise>; // to be run before each cases
-	public var after:Void->Promise<Noise>; // to be run after each cases
-	public var shutdown:Void->Promise<Noise>; // to be run once after all cases
+	public function startup():Promise<Noise>; // to be run once before all cases
+	public function before():Promise<Noise>; // to be run before each cases
+	public function after():Promise<Noise>; // to be run after each cases
+	public function shutdown():Promise<Noise>; // to be run once after all cases
 }
 ```
 
