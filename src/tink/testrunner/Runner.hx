@@ -19,7 +19,7 @@ class Runner {
 			// TODO: #elseif tink_runloop
 		
 		return Future.async(function(cb) {
-			reporter.report(RunnerStart).handle(function(_) {
+			reporter.report(BatchStart).handle(function(_) {
 				var iter = batch.suites.iterator();
 				var results:BatchResult = [];
 				function next() {
@@ -30,7 +30,7 @@ class Runner {
 							reporter.report(SuiteFinish(o)).handle(next);
 						});
 					} else {
-						reporter.report(RunnerFinish(results)).handle(cb.bind(results));
+						reporter.report(BatchFinish(results)).handle(cb.bind(results));
 					}
 				}
 				next();
@@ -54,13 +54,22 @@ class Runner {
 								next();
 							});
 						} else {
-							suite.shutdown().handle(cb.bind({info: suite.info, cases: results}));
+							suite.shutdown().handle(function(o) cb({
+								info: suite.info,
+								result: switch o {
+									case Success(_): Success(results);
+									case Failure(e): ShutdownFailed(e, results);
+								}
+							}));
 						}
 					}
-					suite.startup().handle(next);
+					suite.startup().handle(function(o) switch o {
+						case Success(_): next();
+						case Failure(e): cb({info: suite.info, result: StartupFailed(e)});
+					});
 					
 				} else {
-					cb({info: suite.info, cases: []});
+					cb({info: suite.info, result: Success([])});
 				}
 			});
 		});
@@ -108,24 +117,41 @@ class TimeoutHelper {
 
 @:forward
 abstract BatchResult(Array<SuiteResult>) from Array<SuiteResult> to Array<SuiteResult> {
-	public function failures() {
-		var ret = [];
-		for(s in this) for(c in s.cases) switch c.results {
-			case Success(assertions):
-				ret = ret.concat(
-					assertions.filter(function(a) return !a.holds)
-						.map(function(a) return FailedAssertion(a))
-				);
-			case Failure(e):
-				ret.push(FailedCase(e));
+	public function summary() {
+		var ret = {
+			assertions: [],
+			failures: [],
+		};
+		
+		function handleCases(cases:Array<CaseResult>)
+			for(c in cases) switch c.results {
+				case Success(assertions):
+					ret.assertions = ret.assertions.concat(assertions);
+					ret.failures = ret.failures.concat(
+						assertions.filter(function(a) return !a.holds)
+							.map(function(a) return AssertionFailed(a))
+					);
+				case Failure(e):
+					ret.failures.push(CaseFailed(e));
+			}
+		
+		for(s in this) switch s.result {
+			case Success(cases):
+				handleCases(cases);
+			case StartupFailed(e):
+				ret.failures.push(SuiteFailed(e));
+			case ShutdownFailed(e, cases): 
+			 	handleCases(cases);
+				ret.failures.push(SuiteFailed(e));
 		}
+		
 		return ret;
 	}
 }
 
 typedef SuiteResult = {
 	info:SuiteInfo,
-	cases:Array<CaseResult>,
+	result:SuiteResultType,
 }
 
 typedef CaseResult = {
@@ -133,7 +159,14 @@ typedef CaseResult = {
 	results:Outcome<Array<Assertion>, Error>,
 }
 
+enum SuiteResultType {
+	Success(cases:Array<CaseResult>);
+	StartupFailed(e:Error);
+	ShutdownFailed(e:Error, cases:Array<CaseResult>);
+}
+
 enum FailureType {
-	FailedAssertion(assertion:Assertion);
-	FailedCase(err:Error);
+	AssertionFailed(assertion:Assertion);
+	CaseFailed(err:Error);
+	SuiteFailed(err:Error);
 }

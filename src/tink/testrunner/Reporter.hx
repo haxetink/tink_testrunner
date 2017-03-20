@@ -23,12 +23,12 @@ interface Reporter {
 }
 
 enum ReportType {
-	RunnerStart;
+	BatchStart;
 	SuiteStart(info:SuiteInfo);
 	CaseStart(info:CaseInfo);
 	CaseFinish(result:CaseResult);
 	SuiteFinish(result:SuiteResult);
-	RunnerFinish(result:Array<SuiteResult>);
+	BatchFinish(result:BatchResult);
 }
 
 class BasicReporter implements Reporter {
@@ -39,7 +39,7 @@ class BasicReporter implements Reporter {
 	
 	public function report(type:ReportType):Future<Noise> {
 		switch type {
-			case RunnerStart:
+			case BatchStart:
 				
 			case SuiteStart(info):
 				println(' ');
@@ -59,22 +59,20 @@ class BasicReporter implements Reporter {
 				
 			case SuiteFinish(result):
 				
-			case RunnerFinish(result):
-				var total = 0;
-				var errors = 0;
-				for(s in result) {
-					for(c in s.cases) switch c.results {
-						case Success(assertions):
-							total += assertions.length;
-							errors += assertions.count(function(a) return !a.holds);
-						case Failure(e):
-							println(e.toString());
-					}
-				}
+			case BatchFinish(result):
 				
-				var success = total - errors;
+				var summary = result.summary();
+				var total = summary.assertions.length;
+				var failures = summary.failures.count(function(f) return f.match(AssertionFailed(_)));
+				var success = total - failures;
+				var errors = summary.failures.filter(function(f) return !f.match(AssertionFailed(_)));
 				println(' ');
-				println('$total Assertions   $success Success   $errors Errors');
+				println('$total Assertions   $success Success   $failures failures');
+				if(errors.length > 0) for(err in errors) switch err {
+					case AssertionFailed(_): // unreachable
+					case CaseFailed(e): println('Case Errored: ' + e.toString());
+					case SuiteFailed(e): println('Suite Errored: ' + e.toString());
+				}
 				println(' ');
 				
 		}
