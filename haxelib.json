@@ -6,8 +6,8 @@
   "contributors": [
     "kevinresol"
   ],
-  "releasenote": "Changed defintion of Assertion",
-  "version": "0.2.0",
+  "releasenote": "Assertion result can hold a string failure now",
+  "version": "0.3.0",
   "url": "https://github.com/haxetink/tink_testrunner/",
   "dependencies": {
     "tink_streams": "",
