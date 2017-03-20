@@ -42,7 +42,7 @@ class BasicReporter implements Reporter {
 			case RunnerStart:
 				
 			case SuiteStart(info):
-				println('');
+				println(' ');
 				println(info.name);
 				
 			case CaseStart(info):
@@ -51,11 +51,10 @@ class BasicReporter implements Reporter {
 			case CaseFinish({results: results}):
 				switch results {
 					case Success(results):
-						for(assertion in results) {
-							println(indent(assertion.description + ': ' + assertion.holds, 4));
-						}
+						for(assertion in results)
+							println(indent('- Assertion ${assertion.holds ? 'holds' : 'failed'}: ${assertion.description}', 4));
 					case Failure(e):
-						println(indent(e.toString(), 8));
+						println(indent('- ${e.toString()}', 4));
 			}
 				
 			case SuiteFinish(result):
@@ -74,15 +73,15 @@ class BasicReporter implements Reporter {
 				}
 				
 				var success = total - errors;
-				println('');
+				println(' ');
 				println('$total Assertions   $success Success   $errors Errors');
-				println('');
+				println(' ');
 				
 		}
 		return noise;
 	}
 	
-	function indent(v:String, i:Int) {
+	function indent(v:String, i = 0) {
 		return v.split('\n')
 			.map(function(line) return ''.lpad(' ', i) + line)
 			.join('\n');
