@@ -1,13 +1,19 @@
-# tink_testrunner
+# tink_testrunner [![Build Status](https://travis-ci.org/haxetink/tink_testrunner.svg?branch=master)](https://travis-ci.org/haxetink/tink_testrunner)
 
 
 tink_testrunner logically breaking down a test into several major parts:
 
 ### Assertion
 
-An assertion is merely a "success or failure" value. 
+Contains the result, a human-readable description and position of an assertion.
 
-It is perfectly represented by `tink.core.Outcome`.
+```haxe
+class Assertion {
+	public var holds(default, null):Bool;
+	public var description(default, null):String;
+	public var pos(default, null):PosInfos;
+}
+```
 
 ### Assertions
 
@@ -19,7 +25,7 @@ After all, `Stream` is the async counterpart of `Array`.
 
 ### Case
 
-A Case is a function that emits Assertions.
+A function that emits Assertions.
 
 So it is basically `Void->Assertions`. However, in order to support more fine-grain controls
 on what tests to be included/excluded, the actual implementation of a Case does include some extra control informations.
@@ -36,7 +42,7 @@ interface Case {
 
 ### Suite
 
-A Suite is a collection of Cases.
+A collection of Cases.
 
 So basically it is `Array<Case>`. However, we may also want to execute some pre/post actions for a case,
 so the actual implementation looks like this:
@@ -54,7 +60,7 @@ class Suite {
 
 ### Batch
 
-A Batch is a colllection of Suites.
+A colllection of Suites.
 
 This time it is really just `Array<Suite>`.
 
