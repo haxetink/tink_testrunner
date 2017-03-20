@@ -6,8 +6,8 @@
   "contributors": [
     "kevinresol"
   ],
-  "releasenote": "initial release",
-  "version": "0.1.0",
+  "releasenote": "Changed defintion of Assertion",
+  "version": "0.2.0",
   "url": "https://github.com/haxetink/tink_testrunner/",
   "dependencies": {
     "tink_streams": "",
