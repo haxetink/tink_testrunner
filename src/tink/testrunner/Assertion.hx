@@ -22,7 +22,14 @@ abstract AssertionResult(Outcome<Noise, String>) from Outcome<Noise, String> to 
 	@:from
 	public static function ofBool(v:Bool):AssertionResult
 		return v ? Success(Noise) : Failure('Assertion Failed');
+		
 	@:to
-	public inline function isSuccess():Bool
+	public function toBool():Bool
 		return this.isSuccess();
+		
+	@:op(!A) inline function not() return !toBool();
+	@:op(A && B) static function and_(a:AssertionResult, b:Bool) return a.toBool() && b;
+	@:op(A || B) static function or_(a:AssertionResult, b:Bool) return a.toBool() || b;
+	@:op(A && B) static function _and(a:Bool, b:AssertionResult) return a && b.toBool();
+	@:op(A || B) static function _or(a:Bool, b:AssertionResult) return a || b.toBool();
 }

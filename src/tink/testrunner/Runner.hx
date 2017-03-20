@@ -137,7 +137,7 @@ abstract BatchResult(Array<SuiteResult>) from Array<SuiteResult> to Array<SuiteR
 				case Success(assertions):
 					ret.assertions = ret.assertions.concat(assertions);
 					ret.failures = ret.failures.concat(
-						assertions.filter(function(a) return !a.holds.isSuccess())
+						assertions.filter(function(a) return !a.holds)
 							.map(function(a) return AssertionFailed(a))
 					);
 				case Failure(e):
