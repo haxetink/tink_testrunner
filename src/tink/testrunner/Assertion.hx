@@ -24,12 +24,12 @@ abstract AssertionResult(Outcome<Noise, String>) from Outcome<Noise, String> to 
 		return v ? Success(Noise) : Failure('Assertion Failed');
 		
 	@:to
-	public function toBool():Bool
+	public inline function toBool():Bool
 		return this.isSuccess();
 		
 	@:op(!A) inline function not() return !toBool();
-	@:op(A && B) static function and_(a:AssertionResult, b:Bool) return a.toBool() && b;
-	@:op(A || B) static function or_(a:AssertionResult, b:Bool) return a.toBool() || b;
-	@:op(A && B) static function _and(a:Bool, b:AssertionResult) return a && b.toBool();
-	@:op(A || B) static function _or(a:Bool, b:AssertionResult) return a || b.toBool();
+	@:op(A && B) static inline function and_(a:AssertionResult, b:Bool) return a.toBool() && b;
+	@:op(A || B) static inline function or_(a:AssertionResult, b:Bool) return a.toBool() || b;
+	@:op(A && B) static inline function _and(a:Bool, b:AssertionResult) return a && b.toBool();
+	@:op(A || B) static inline function _or(a:Bool, b:AssertionResult) return a || b.toBool();
 }
