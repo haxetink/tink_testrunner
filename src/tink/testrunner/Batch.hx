@@ -24,12 +24,6 @@ abstract Batch(Array<Suite>) from Array<Suite> to Array<Suite> {
 	public static inline function ofCase(caze:Case):Batch
 		return ofCases([caze]);
 		
-	@:allow(tink.testrunner)
-	function includeMode() {
-		for(s in this) if(s.includeMode()) return true;
-		return false;
-	}
-		
 	inline function get_suites()
 		return this;
 }

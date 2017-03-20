@@ -17,6 +17,15 @@ class Runner {
 			// TODO: figure this out: #if (haxe_ver >= 3.4 || js || flash)
 			timers = new HaxeTimerManager();
 			// TODO: #elseif tink_runloop
+			
+		var includeMode = false;
+		for(s in batch.suites) {
+			if(includeMode) break;
+			for(c in s.cases) if(c.include) {
+				includeMode = true;
+				break;
+			}
+		}
 		
 		return Future.async(function(cb) {
 			reporter.report(BatchStart).handle(function(_) {
@@ -25,7 +34,7 @@ class Runner {
 				function next() {
 					if(iter.hasNext()) {
 						var suite = iter.next();
-						runSuite(suite, reporter, timers, batch.includeMode()).handle(function(o) {
+						runSuite(suite, reporter, timers, includeMode).handle(function(o) {
 							results.push(o);
 							reporter.report(SuiteFinish(o)).handle(next);
 						});

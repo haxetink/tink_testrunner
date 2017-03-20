@@ -48,13 +48,13 @@ So basically it is `Array<Case>`. However, we may also want to execute some pre/
 so the actual implementation looks like this:
 
 ```haxe
-class Suite {
-	public var info:SuiteInfo; // meta info
-	public var cases:Array<Case>;
-	public function startup():Promise<Noise>; // to be run once before all cases
-	public function before():Promise<Noise>; // to be run before each cases
-	public function after():Promise<Noise>; // to be run after each cases
-	public function shutdown():Promise<Noise>; // to be run once after all cases
+interface Suite {
+	var info:SuiteInfo; // meta info
+	var cases:Array<Case>;
+	function startup():Promise<Noise>; // to be run once before all cases
+	function before():Promise<Noise>; // to be run before each cases
+	function after():Promise<Noise>; // to be run after each cases
+	function shutdown():Promise<Noise>; // to be run once after all cases
 }
 ```
 
