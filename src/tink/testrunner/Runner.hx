@@ -108,13 +108,18 @@ class TimeoutHelper {
 
 @:forward
 abstract BatchResult(Array<SuiteResult>) from Array<SuiteResult> to Array<SuiteResult> {
-	public function errors() {
+	public function failures() {
 		var ret = [];
 		for(s in this) for(c in s.cases) switch c.results {
-			case Success(assertions): ret = ret.concat(assertions.filter(function(a) return !a.holds));
-			case Failure(e): return Failure(e);
+			case Success(assertions):
+				ret = ret.concat(
+					assertions.filter(function(a) return !a.holds)
+						.map(function(a) return FailedAssertion(a))
+				);
+			case Failure(e):
+				ret.push(FailedCase(e));
 		}
-		return Success(ret);
+		return ret;
 	}
 }
 
@@ -126,4 +131,9 @@ typedef SuiteResult = {
 typedef CaseResult = {
 	info:CaseInfo,
 	results:Outcome<Array<Assertion>, Error>,
+}
+
+enum FailureType {
+	FailedAssertion(assertion:Assertion);
+	FailedCase(err:Error);
 }

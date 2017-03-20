@@ -30,7 +30,7 @@ class RunTests {
 		var single = new SingleCase();
 		futures.push(
 			function() return Runner.run(single).map(function(result) {
-				assertEquals(0, result.errors().sure().length);
+				assertEquals(0, result.failures().length);
 				return Noise;
 			})
 		);
@@ -38,7 +38,7 @@ class RunTests {
 		// Test: cast from multiple cases
 		futures.push(
 			function() return Runner.run([single, single]).map(function(result) {
-				assertEquals(0, result.errors().sure().length);
+				assertEquals(0, result.failures().length);
 				return Noise;
 			})
 		);
