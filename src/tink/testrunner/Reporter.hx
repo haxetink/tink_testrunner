@@ -49,12 +49,14 @@ class BasicReporter implements Reporter {
 				println(indent(info.description, 2));
 				
 			case CaseFinish({results: results}):
-				for(r in results) {
-					switch r {
-						case Success(_):
-						case Failure(e): println(indent(e.toString(), 8));
-					}
-				}
+				switch results {
+					case Success(results):
+						for(assertion in results) {
+							println(indent(assertion.description + ': ' + assertion.holds, 4));
+						}
+					case Failure(e):
+						println(indent(e.toString(), 8));
+			}
 				
 			case SuiteFinish(result):
 				
@@ -62,11 +64,15 @@ class BasicReporter implements Reporter {
 				var total = 0;
 				var errors = 0;
 				for(s in result) {
-					for(c in s.cases) {
-						total += c.results.length;
-						errors += c.results.count(function(r) return !r.isSuccess());
+					for(c in s.cases) switch c.results {
+						case Success(assertions):
+							total += assertions.length;
+							errors += assertions.count(function(a) return !a.holds);
+						case Failure(e):
+							println(e.toString());
 					}
 				}
+				
 				var success = total - errors;
 				println('');
 				println('$total Assertions   $success Success   $errors Errors');

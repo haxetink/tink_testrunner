@@ -73,14 +73,10 @@ class Runner {
 				suite.before().timeout(caze.timeout, timers)
 					.next(function(_) return caze.execute().collect().timeout(caze.timeout, timers))
 					.next(function(result) return suite.after().timeout(caze.timeout, timers).next(function(_) return result))
-					.map(function(o) return switch o {
-						case Success(assertions): assertions;
-						case Failure(e): [Failure(e)];
-					})
-					.handle(function(o) {
+					.handle(function(result) {
 						var results = {
 							info: caze.info,
-							results: o,
+							results: result,
 						}
 						reporter.report(CaseFinish(results)).handle(function(_) cb(results));
 					});
@@ -114,12 +110,11 @@ class TimeoutHelper {
 abstract BatchResult(Array<SuiteResult>) from Array<SuiteResult> to Array<SuiteResult> {
 	public function errors() {
 		var ret = [];
-		for(s in this) for(c in s.cases) for(a in c.results)
-			switch a {
-				case Success(_): // skip
-				case Failure(_): ret.push(a);
-			}
-		return ret;
+		for(s in this) for(c in s.cases) switch c.results {
+			case Success(assertions): ret = ret.concat(assertions.filter(function(a) return !a.holds));
+			case Failure(e): return Failure(e);
+		}
+		return Success(ret);
 	}
 }
 
@@ -130,5 +125,5 @@ typedef SuiteResult = {
 
 typedef CaseResult = {
 	info:CaseInfo,
-	results:Array<Assertion>,
+	results:Outcome<Array<Assertion>, Error>,
 }
