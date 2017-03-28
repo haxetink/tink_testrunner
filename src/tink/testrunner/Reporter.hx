@@ -7,7 +7,7 @@ import tink.testrunner.Runner;
 #if travix
 import travix.Logger.*;
 #elseif (sys || nodejs)
-import *;
+import Sys.*;
 #else
 	#error "TODO"
 #end
