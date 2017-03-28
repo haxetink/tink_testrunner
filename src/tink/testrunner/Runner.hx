@@ -10,6 +10,12 @@ using tink.CoreApi;
 
 class Runner {
 	
+	public static function exit(result:BatchResult)
+		#if travix travix.Logger.exit
+		#elseif sys Sys.exit
+		#else #error "not supported"
+		#end (result.summary().failures.length);
+	
 	public static function run(batch:Batch, ?reporter:Reporter, ?timers:TimerManager):Future<BatchResult> {
 		
 		if(reporter == null) reporter = new BasicReporter();
