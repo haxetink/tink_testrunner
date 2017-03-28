@@ -26,6 +26,7 @@ enum ReportType {
 	BatchStart;
 	SuiteStart(info:SuiteInfo);
 	CaseStart(info:CaseInfo);
+	Assertion(assertion:Assertion);
 	CaseFinish(result:CaseResult);
 	SuiteFinish(result:SuiteResult);
 	BatchFinish(result:BatchResult);
@@ -48,11 +49,12 @@ class BasicReporter implements Reporter {
 			case CaseStart(info):
 				println(indent(info.description, 2));
 				
+			case Assertion(assertion):
+				println(indent('- Assertion ${assertion.holds ? 'holds' : 'failed'}: ${assertion.description}', 4));
+				
 			case CaseFinish({results: results}):
 				switch results {
-					case Success(results):
-						for(assertion in results)
-							println(indent('- Assertion ${assertion.holds ? 'holds' : 'failed'}: ${assertion.description}', 4));
+					case Success(_):
 					case Failure(e):
 						println(indent('- ${e.toString()}', 4));
 			}

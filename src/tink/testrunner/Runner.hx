@@ -89,7 +89,16 @@ class Runner {
 			reporter.report(CaseStart(caze.info)).handle(function(_) {
 				
 				suite.before().timeout(caze.timeout, timers)
-					.next(function(_) return caze.execute().collect().timeout(caze.timeout, timers))
+					.next(function(_) {
+						var assertions = [];
+						return caze.execute().forEach(function(a) {
+							assertions.push(a);
+							reporter.report(Assertion(a));
+							return true;
+						})
+							.map(function(_) return assertions)
+							.timeout(caze.timeout, timers);
+					})
 					.next(function(result) return suite.after().timeout(caze.timeout, timers).next(function(_) return result))
 					.handle(function(result) {
 						var results = {
