@@ -16,6 +16,10 @@ abstract Assertions(Stream<Assertion>) from Stream<Assertion> to Stream<Assertio
 	public static inline function ofArray(o:Array<Assertion>):Assertions {
 		return o.iterator();
 	}
+	@:from
+	public static inline function ofPromiseArray(o:Promise<Array<Assertion>>):Assertions {
+		return o.next(function(o):Stream<Assertion> return o.iterator());
+	}
 	
 	@:from
 	public static function ofFutureAssertion(p:Future<Assertion>):Assertions {
