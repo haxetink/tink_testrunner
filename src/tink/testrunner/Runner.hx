@@ -97,11 +97,11 @@ class Runner {
 				suite.before().timeout(caze.timeout, timers)
 					.next(function(_) {
 						var assertions = [];
-						return caze.execute().forEach(function(a) {
-							assertions.push(a);
-							reporter.report(Assertion(a));
-							return true;
-						})
+						return caze.execute()
+							.forEachAsync(function(a) {
+								assertions.push(a);
+								return reporter.report(Assertion(a)).map(function(_) return true);
+							})
 							.map(function(_) return assertions)
 							.timeout(caze.timeout, timers);
 					})
