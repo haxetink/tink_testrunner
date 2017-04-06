@@ -46,7 +46,7 @@ class BasicFormatter implements Formatter {
 	public function extra(v:String):String
 		return color(v, 'cyan');
 	public function normal(v:String):String
-		return color(v, null);
+		return color(v, '');
 	public function color(v:String, c:String):String
 		return v;
 }
