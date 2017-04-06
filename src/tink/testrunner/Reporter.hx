@@ -27,6 +27,8 @@ interface Formatter {
 	function error(v:String):String;
 	function warning(v:String):String;
 	function info(v:String):String;
+	function extra(v:String):String;
+	function normal(v:String):String;
 	function color(v:String, color:String):String;
 }
 
@@ -41,6 +43,10 @@ class BasicFormatter implements Formatter {
 		return color(v, 'yellow');
 	public function info(v:String):String
 		return color(v, 'yellow');
+	public function extra(v:String):String
+		return color(v, 'cyan');
+	public function normal(v:String):String
+		return color(v, null);
 	public function color(v:String, c:String):String
 		return v;
 }
@@ -51,8 +57,11 @@ class AnsiFormatter extends BasicFormatter {
 		return switch c {
 			case 'red': ANSI.aset([ANSI.Attribute.Red]) + v + ANSI.aset([ANSI.Attribute.DefaultForeground]);
 			case 'green': ANSI.aset([ANSI.Attribute.Green]) + v + ANSI.aset([ANSI.Attribute.DefaultForeground]);
+			case 'blue': ANSI.aset([ANSI.Attribute.Blue]) + v + ANSI.aset([ANSI.Attribute.DefaultForeground]);
 			case 'yellow': ANSI.aset([ANSI.Attribute.Yellow]) + v + ANSI.aset([ANSI.Attribute.DefaultForeground]);
-			default: v;
+			case 'magenta': ANSI.aset([ANSI.Attribute.Magenta]) + v + ANSI.aset([ANSI.Attribute.DefaultForeground]);
+			case 'cyan': ANSI.aset([ANSI.Attribute.Cyan]) + v + ANSI.aset([ANSI.Attribute.DefaultForeground]);
+			default: ANSI.aset([ANSI.Attribute.DefaultForeground]) + v;
 		}
 }
 #end
@@ -89,7 +98,10 @@ class BasicReporter implements Reporter {
 				println(formatter.info(indent(info.description, 2)));
 				
 			case Assertion(assertion):
-				var m = indent('- Assertion ${assertion.holds ? 'holds' : 'failed'}: ${assertion.description}', 4);
+				var holds = assertion.holds ? formatter.success('[OK]') : formatter.error('[FAIL]');
+				var pos = formatter.extra('[${assertion.pos.fileName}:${assertion.pos.lineNumber}]');
+				var dash = formatter.normal('-');
+				var m = indent('$dash $holds $pos ${assertion.description}', 4);
 				println(assertion.holds ? m : formatter.error(m));
 				
 			case CaseFinish({results: results}):
