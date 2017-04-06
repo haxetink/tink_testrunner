@@ -6,8 +6,8 @@
   "contributors": [
     "kevinresol"
   ],
-  "releasenote": "Add colored reporter (fix php)",
-  "version": "0.5.1",
+  "releasenote": "Nicer output",
+  "version": "0.5.2",
   "url": "https://github.com/haxetink/tink_testrunner/",
   "dependencies": {
     "ansi": "",
