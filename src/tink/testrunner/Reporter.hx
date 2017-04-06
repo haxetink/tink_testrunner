@@ -4,16 +4,6 @@ import tink.testrunner.Suite;
 import tink.testrunner.Case;
 import tink.testrunner.Runner;
 
-#if travix
-import travix.Logger.*;
-#elseif (sys || nodejs)
-import Sys.*;
-#else
-	#error "TODO"
-#end
-
-
-
 using tink.CoreApi;
 using Lambda;
 using StringTools;
@@ -32,11 +22,60 @@ enum ReportType {
 	BatchFinish(result:BatchResult);
 }
 
+interface Formatter {
+	function success(v:String):String;
+	function error(v:String):String;
+	function warning(v:String):String;
+	function info(v:String):String;
+	function color(v:String, color:String):String;
+}
+
+class BasicFormatter implements Formatter {
+	public function new() {}
+	
+	public function success(v:String):String
+		return color(v, 'green');
+	public function error(v:String):String
+		return color(v, 'red');
+	public function warning(v:String):String
+		return color(v, 'yellow');
+	public function info(v:String):String
+		return color(v, 'yellow');
+	public function color(v:String, c:String):String
+		return v;
+}
+
+#if ansi
+class AnsiFormatter extends BasicFormatter {
+	override function color(v:String, c:String):String
+		return switch c {
+			case 'red': ANSI.set(ANSI.attr.Red) + v + ANSI.set(ANSI.attr.DefaultForeground);
+			case 'green': ANSI.set(ANSI.attr.Green) + v + ANSI.set(ANSI.attr.DefaultForeground);
+			case 'yellow': ANSI.set(ANSI.attr.Yellow) + v + ANSI.set(ANSI.attr.DefaultForeground);
+			default: v;
+		}
+}
+#end
+
 class BasicReporter implements Reporter {
 	
 	var noise = Future.sync(Noise);
+	var formatter:Formatter;
 	
-	public function new() {}
+	public function new(?formatter) {
+		this.formatter =
+			if(formatter != null)
+				formatter;
+			else
+				#if (ansi && (sys || nodejs))
+					switch Sys.systemName() {
+						case 'Windows': new BasicFormatter();
+						default: new AnsiFormatter();
+					}
+				#else
+					new BasicFormatter();
+				#end
+	}
 	
 	public function report(type:ReportType):Future<Noise> {
 		switch type {
@@ -44,19 +83,20 @@ class BasicReporter implements Reporter {
 				
 			case SuiteStart(info):
 				println(' ');
-				println(info.name);
+				println(formatter.info(info.name));
 				
 			case CaseStart(info):
-				println(indent(info.description, 2));
+				println(formatter.info(indent(info.description, 2)));
 				
 			case Assertion(assertion):
-				println(indent('- Assertion ${assertion.holds ? 'holds' : 'failed'}: ${assertion.description}', 4));
+				var m = indent('- Assertion ${assertion.holds ? 'holds' : 'failed'}: ${assertion.description}', 4);
+				println(assertion.holds ? m : formatter.error(m));
 				
 			case CaseFinish({results: results}):
 				switch results {
 					case Success(_):
 					case Failure(e):
-						println(indent('- ${e.toString()}', 4));
+						println(formatter.error(indent('- ${e.toString()}', 4)));
 			}
 				
 			case SuiteFinish(result):
@@ -68,18 +108,29 @@ class BasicReporter implements Reporter {
 				var failures = summary.failures.count(function(f) return f.match(AssertionFailed(_)));
 				var success = total - failures;
 				var errors = summary.failures.filter(function(f) return !f.match(AssertionFailed(_)));
+				
+				var m = '$total Assertions   $success Success   $failures failures';
 				println(' ');
-				println('$total Assertions   $success Success   $failures failures');
+				println(failures == 0 ? formatter.success(m) : formatter.error(m));
 				if(errors.length > 0) for(err in errors) switch err {
 					case AssertionFailed(_): // unreachable
-					case CaseFailed(e): println('Case Errored: ' + e.toString());
-					case SuiteFailed(e): println('Suite Errored: ' + e.toString());
+					case CaseFailed(e): println(formatter.error('Case Errored: ' + e.toString()));
+					case SuiteFailed(e): println(formatter.error('Suite Errored: ' + e.toString()));
 				}
 				println(' ');
 				
 		}
 		return noise;
 	}
+	
+	function println(v:String)
+		#if travix
+			travix.Logger.println(v);
+		#elseif (sys || nodejs)
+			Sys.println(v);
+		#else
+			#error "Not supported yet"
+		#end
 	
 	function indent(v:String, i = 0) {
 		return v.split('\n')
