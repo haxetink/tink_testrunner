@@ -49,9 +49,9 @@ class BasicFormatter implements Formatter {
 class AnsiFormatter extends BasicFormatter {
 	override function color(v:String, c:String):String
 		return switch c {
-			case 'red': ANSI.set(ANSI.attr.Red) + v + ANSI.set(ANSI.attr.DefaultForeground);
-			case 'green': ANSI.set(ANSI.attr.Green) + v + ANSI.set(ANSI.attr.DefaultForeground);
-			case 'yellow': ANSI.set(ANSI.attr.Yellow) + v + ANSI.set(ANSI.attr.DefaultForeground);
+			case 'red': ANSI.aset([ANSI.Attribute.Red]) + v + ANSI.aset([ANSI.Attribute.DefaultForeground]);
+			case 'green': ANSI.aset([ANSI.Attribute.Green]) + v + ANSI.aset([ANSI.Attribute.DefaultForeground]);
+			case 'yellow': ANSI.aset([ANSI.Attribute.Yellow]) + v + ANSI.aset([ANSI.Attribute.DefaultForeground]);
 			default: v;
 		}
 }
