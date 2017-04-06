@@ -6,8 +6,8 @@
   "contributors": [
     "kevinresol"
   ],
-  "releasenote": "Add exit helper",
-  "version": "0.4.1",
+  "releasenote": "Add colored reporter",
+  "version": "0.5.0",
   "url": "https://github.com/haxetink/tink_testrunner/",
   "dependencies": {
     "ansi": "",
