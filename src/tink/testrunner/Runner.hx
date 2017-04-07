@@ -1,5 +1,6 @@
 package tink.testrunner;
 
+import tink.streams.Stream;
 import tink.testrunner.Case;
 import tink.testrunner.Suite;
 import tink.testrunner.Reporter;
@@ -98,9 +99,9 @@ class Runner {
 					.next(function(_) {
 						var assertions = [];
 						return caze.execute()
-							.forEachAsync(function(a) {
+							.forEach(function(a) {
 								assertions.push(a);
-								return reporter.report(Assertion(a)).map(function(_) return true);
+								return reporter.report(Assertion(a)).map(function(_) return Resume);
 							})
 							.map(function(_) return assertions)
 							.timeout(caze.timeout, timers);
