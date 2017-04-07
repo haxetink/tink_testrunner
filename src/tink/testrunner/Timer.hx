@@ -8,6 +8,7 @@ interface TimerManager {
 	function schedule(ms:Int, f:Void->Void):Timer;
 }
 
+#if ((haxe_ver >= 3.3) || flash || js || openfl)
 class HaxeTimer implements Timer {
 	
 	var timer:haxe.Timer;
@@ -31,3 +32,4 @@ class HaxeTimerManager implements TimerManager {
 		return new HaxeTimer(ms, f);
 	}
 }
+#end

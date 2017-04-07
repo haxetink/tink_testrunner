@@ -21,9 +21,9 @@ class Runner {
 		
 		if(reporter == null) reporter = new BasicReporter();
 		if(timers == null)
-			// TODO: figure this out: #if (haxe_ver >= 3.4 || js || flash)
-			timers = new HaxeTimerManager();
-			// TODO: #elseif tink_runloop
+			#if ((haxe_ver >= 3.3) || flash || js || openfl)
+				timers = new HaxeTimerManager();
+			#end
 			
 		var includeMode = false;
 		for(s in batch.suites) {
