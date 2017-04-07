@@ -7,7 +7,7 @@
     "kevinresol"
   ],
   "releasenote": "Nicer output",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "url": "https://github.com/haxetink/tink_testrunner/",
   "dependencies": {
     "ansi": "",
