@@ -117,6 +117,12 @@ class BasicReporter implements Reporter {
 			}
 				
 			case SuiteFinish(result):
+			
+				switch result.result {
+					case Success(_): // ok
+					case StartupFailed(e): println(formatter.error(indent('Startup Failed: ${e.toString()}', 2)));
+					case ShutdownFailed(e, _): println(formatter.error(indent('Shutdown Failed: ${e.toString()}', 2)));
+				}
 				
 			case BatchFinish(result):
 				
@@ -126,14 +132,30 @@ class BasicReporter implements Reporter {
 				var success = total - failures;
 				var errors = summary.failures.filter(function(f) return !f.match(AssertionFailed(_)));
 				
-				var m = '$total Assertions   $success Success   $failures failures';
+				var m = new StringBuf();
+				m.add(total);
+				m.add(' Assertion');
+				if(total > 1) m.add('s');
+				m.add('   ');
+				
+				m.add(success);
+				m.add(' Success');
+				m.add('   ');
+				
+				m.add(failures);
+				m.add(' Failure');
+				if(failures > 1) m.add('s');
+				m.add('   ');
+				
+				m.add(errors.length);
+				m.add(' Error');
+				if(errors.length > 1) m.add('s');
+				m.add('   ');
+				
+				var m = m.toString();
+				
 				println(' ');
-				println(failures == 0 ? formatter.success(m) : formatter.error(m));
-				if(errors.length > 0) for(err in errors) switch err {
-					case AssertionFailed(_): // unreachable
-					case CaseFailed(e): println(formatter.error('Case Errored: ' + e.toString()));
-					case SuiteFailed(e): println(formatter.error('Suite Errored: ' + e.toString()));
-				}
+				println(failures == 0 && errors.length == 0 ? formatter.success(m) : formatter.error(m));
 				println(' ');
 				
 		}
