@@ -128,9 +128,12 @@ class BasicReporter implements Reporter {
 				
 				var summary = result.summary();
 				var total = summary.assertions.length;
-				var failures = summary.failures.count(function(f) return f.match(AssertionFailed(_)));
+				var failures = 0, errors = 0;
+				for(f in summary.failures) switch f {
+					case AssertionFailed(_): failures++;
+					default: errors++;
+				}
 				var success = total - failures;
-				var errors = summary.failures.filter(function(f) return !f.match(AssertionFailed(_)));
 				
 				var m = new StringBuf();
 				m.add(total);
@@ -147,15 +150,15 @@ class BasicReporter implements Reporter {
 				if(failures > 1) m.add('s');
 				m.add('   ');
 				
-				m.add(errors.length);
+				m.add(errors);
 				m.add(' Error');
-				if(errors.length > 1) m.add('s');
+				if(errors > 1) m.add('s');
 				m.add('   ');
 				
 				var m = m.toString();
 				
 				println(' ');
-				println(failures == 0 && errors.length == 0 ? formatter.success(m) : formatter.error(m));
+				println(failures == 0 && errors == 0 ? formatter.success(m) : formatter.error(m));
 				println(' ');
 				
 		}
