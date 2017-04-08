@@ -21,7 +21,14 @@ class Assertion {
 abstract AssertionResult(Outcome<Noise, String>) from Outcome<Noise, String> to Outcome<Noise, String> {
 	@:from
 	public static function ofBool(v:Bool):AssertionResult
-		return v ? Success(Noise) : Failure('Assertion Failed');
+		return v ? Success(Noise) : Failure(null);
+		
+	@:from
+	public static function ofOutcome<T>(v:Outcome<T, Error>):AssertionResult
+		return switch v {
+			case Success(_): Success(Noise);
+			case Failure(e): Failure(e.message);
+		}
 		
 	@:to
 	public inline function toBool():Bool

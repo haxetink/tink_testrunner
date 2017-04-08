@@ -98,11 +98,18 @@ class BasicReporter implements Reporter {
 				println(formatter.info(indent(info.description, 2)));
 				
 			case Assertion(assertion):
-				var holds = assertion.holds ? formatter.success('[OK]') : formatter.error('[FAIL]');
+			
+				var failure = null;
+				var holds = switch assertion.holds {
+					case Success(_): formatter.success('[OK]');
+					case Failure(msg):
+						failure = msg;
+						formatter.error('[FAIL]');
+				}
 				var pos = formatter.extra('[${assertion.pos.fileName}:${assertion.pos.lineNumber}]');
-				var dash = formatter.normal('-');
-				var m = indent('$dash $holds $pos ${assertion.description}', 4);
-				println(assertion.holds ? m : formatter.error(m));
+				var m = indent('- $holds $pos ${assertion.description}', 4);
+				println(m);
+				if(failure != null) println(formatter.error(indent(failure, 8)));
 				
 			case CaseFinish({results: results}):
 				switch results {
