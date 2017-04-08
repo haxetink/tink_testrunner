@@ -28,6 +28,7 @@ interface Formatter {
 	function warning(v:String):String;
 	function info(v:String):String;
 	function extra(v:String):String;
+	function mute(v:String):String;
 	function normal(v:String):String;
 	function color(v:String, color:String):String;
 }
@@ -35,20 +36,14 @@ interface Formatter {
 class BasicFormatter implements Formatter {
 	public function new() {}
 	
-	public function success(v:String):String
-		return color(v, 'green');
-	public function error(v:String):String
-		return color(v, 'red');
-	public function warning(v:String):String
-		return color(v, 'yellow');
-	public function info(v:String):String
-		return color(v, 'yellow');
-	public function extra(v:String):String
-		return color(v, 'cyan');
-	public function normal(v:String):String
-		return color(v, '');
-	public function color(v:String, c:String):String
-		return v;
+	public function success(v:String):String return color(v, 'green');
+	public function error(v:String):String return color(v, 'red');
+	public function warning(v:String):String return color(v, 'yellow');
+	public function info(v:String):String return color(v, 'yellow');
+	public function extra(v:String):String return color(v, 'cyan');
+	public function mute(v:String):String return color(v, 'blue');
+	public function normal(v:String):String return color(v, '');
+	public function color(v:String, c:String):String return v;
 }
 
 #if ansi
@@ -95,7 +90,10 @@ class BasicReporter implements Reporter {
 				println(formatter.info(info.name));
 				
 			case CaseStart(info):
-				println(formatter.info(indent(info.description, 2)));
+				var m = formatter.info(indent(info.name, 2)) + ': ';
+				if(info.pos != null) m += formatter.extra('[${info.pos.fileName}:${info.pos.lineNumber}] ');
+				if(info.description != null) m += formatter.mute(info.description);
+				println(m);
 				
 			case Assertion(assertion):
 			
