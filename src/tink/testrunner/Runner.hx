@@ -103,7 +103,11 @@ class Runner {
 								assertions.push(a);
 								return reporter.report(Assertion(a)).map(function(_) return Resume);
 							})
-							.map(function(_) return assertions)
+							.next(function(o):Outcome<Array<Assertion>, Error> return switch o {
+								case Depleted: Success(assertions);
+								case Halted(_): throw 'unreachable';
+								case Failed(e): Failure(e);
+							})
 							.timeout(caze.timeout, timers);
 					})
 					.next(function(result) return suite.after().timeout(caze.timeout, timers).next(function(_) return result))
