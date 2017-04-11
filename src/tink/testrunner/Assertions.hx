@@ -1,13 +1,14 @@
 package tink.testrunner;
 
 import tink.streams.Stream;
-import tink.streams.Accumulator;
 import haxe.PosInfos;
 
 using tink.CoreApi;
 
+private typedef Impl = Stream<Assertion #if pure , Error #end>;
+
 @:forward
-abstract Assertions(Stream<Assertion>) from Stream<Assertion> to Stream<Assertion> {
+abstract Assertions(Impl) from Impl to Impl {
 	@:from
 	public static inline function ofAssertion(o:Assertion):Assertions {
 		return [o].iterator();
@@ -18,7 +19,7 @@ abstract Assertions(Stream<Assertion>) from Stream<Assertion> to Stream<Assertio
 	}
 	@:from
 	public static inline function ofPromiseArray(o:Promise<Array<Assertion>>):Assertions {
-		return o.next(function(o):Stream<Assertion> return o.iterator());
+		return o.next(function(o):Impl return o.iterator());
 	}
 	
 	@:from
@@ -43,6 +44,6 @@ abstract Assertions(Stream<Assertion>) from Stream<Assertion> to Stream<Assertio
 	
 	@:from
 	public static inline function ofSurpriseAssertions(p:Surprise<Assertions, Error>):Assertions {
-		return Stream.later((p:Surprise<Stream<Assertion>, Error>));
+		return Stream #if pure .promise #else .later #end ((p:Surprise<Impl, Error>));
 	}
 }

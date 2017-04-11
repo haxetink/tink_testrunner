@@ -28,6 +28,7 @@ interface Formatter {
 	function warning(v:String):String;
 	function info(v:String):String;
 	function extra(v:String):String;
+	function mute(v:String):String;
 	function normal(v:String):String;
 	function color(v:String, color:String):String;
 }
@@ -35,20 +36,14 @@ interface Formatter {
 class BasicFormatter implements Formatter {
 	public function new() {}
 	
-	public function success(v:String):String
-		return color(v, 'green');
-	public function error(v:String):String
-		return color(v, 'red');
-	public function warning(v:String):String
-		return color(v, 'yellow');
-	public function info(v:String):String
-		return color(v, 'yellow');
-	public function extra(v:String):String
-		return color(v, 'cyan');
-	public function normal(v:String):String
-		return color(v, '');
-	public function color(v:String, c:String):String
-		return v;
+	public function success(v:String):String return color(v, 'green');
+	public function error(v:String):String return color(v, 'red');
+	public function warning(v:String):String return color(v, 'yellow');
+	public function info(v:String):String return color(v, 'yellow');
+	public function extra(v:String):String return color(v, 'cyan');
+	public function mute(v:String):String return color(v, 'blue');
+	public function normal(v:String):String return color(v, '');
+	public function color(v:String, c:String):String return v;
 }
 
 #if ansi
@@ -95,14 +90,24 @@ class BasicReporter implements Reporter {
 				println(formatter.info(info.name));
 				
 			case CaseStart(info):
-				println(formatter.info(indent(info.description, 2)));
+				var m = formatter.info(indent(info.name, 2)) + ': ';
+				if(info.pos != null) m += formatter.extra('[${info.pos.fileName}:${info.pos.lineNumber}] ');
+				if(info.description != null) m += formatter.mute(info.description);
+				println(m);
 				
 			case Assertion(assertion):
-				var holds = assertion.holds ? formatter.success('[OK]') : formatter.error('[FAIL]');
+			
+				var failure = null;
+				var holds = switch assertion.holds {
+					case Success(_): formatter.success('[OK]');
+					case Failure(msg):
+						failure = msg;
+						formatter.error('[FAIL]');
+				}
 				var pos = formatter.extra('[${assertion.pos.fileName}:${assertion.pos.lineNumber}]');
-				var dash = formatter.normal('-');
-				var m = indent('$dash $holds $pos ${assertion.description}', 4);
-				println(assertion.holds ? m : formatter.error(m));
+				var m = indent('- $holds $pos ${assertion.description}', 4);
+				println(m);
+				if(failure != null) println(formatter.error(indent(failure, 8)));
 				
 			case CaseFinish({results: results}):
 				switch results {
@@ -112,23 +117,48 @@ class BasicReporter implements Reporter {
 			}
 				
 			case SuiteFinish(result):
+			
+				switch result.result {
+					case Success(_): // ok
+					case StartupFailed(e): println(formatter.error(indent('Startup Failed: ${e.toString()}', 2)));
+					case ShutdownFailed(e, _): println(formatter.error(indent('Shutdown Failed: ${e.toString()}', 2)));
+				}
 				
 			case BatchFinish(result):
 				
 				var summary = result.summary();
 				var total = summary.assertions.length;
-				var failures = summary.failures.count(function(f) return f.match(AssertionFailed(_)));
-				var success = total - failures;
-				var errors = summary.failures.filter(function(f) return !f.match(AssertionFailed(_)));
-				
-				var m = '$total Assertions   $success Success   $failures failures';
-				println(' ');
-				println(failures == 0 ? formatter.success(m) : formatter.error(m));
-				if(errors.length > 0) for(err in errors) switch err {
-					case AssertionFailed(_): // unreachable
-					case CaseFailed(e): println(formatter.error('Case Errored: ' + e.toString()));
-					case SuiteFailed(e): println(formatter.error('Suite Errored: ' + e.toString()));
+				var failures = 0, errors = 0;
+				for(f in summary.failures) switch f {
+					case AssertionFailed(_): failures++;
+					default: errors++;
 				}
+				var success = total - failures;
+				
+				var m = new StringBuf();
+				m.add(total);
+				m.add(' Assertion');
+				if(total > 1) m.add('s');
+				m.add('   ');
+				
+				m.add(success);
+				m.add(' Success');
+				m.add('   ');
+				
+				m.add(failures);
+				m.add(' Failure');
+				if(failures > 1) m.add('s');
+				m.add('   ');
+				
+				m.add(errors);
+				m.add(' Error');
+				if(errors > 1) m.add('s');
+				m.add('   ');
+				
+				var m = m.toString();
+				
+				println(' ');
+				println(failures == 0 && errors == 0 ? formatter.success(m) : formatter.error(m));
 				println(' ');
 				
 		}

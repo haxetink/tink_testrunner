@@ -12,7 +12,9 @@ interface Case {
 }
 
 typedef CaseInfo = {
+	name:String,
 	description:String,
+	pos:PosInfos,
 }
 
 class BasicCase implements Case {
@@ -22,9 +24,11 @@ class BasicCase implements Case {
 	public var exclude:Bool = false;
 	public var pos:PosInfos = null;
 	
-	public function new() {
+	public function new(?pos:PosInfos) {
 		info = {
-			description: Type.getClassName(Type.getClass(this)),
+			name: Type.getClassName(Type.getClass(this)),
+			description: null,
+			pos: pos,
 		}
 	}
 	

@@ -1,5 +1,6 @@
 package tink.testrunner;
 
+import tink.streams.Stream;
 import tink.testrunner.Case;
 import tink.testrunner.Suite;
 import tink.testrunner.Reporter;
@@ -85,6 +86,7 @@ class Runner {
 					});
 					
 				} else {
+					// skip startup and shutdown
 					cb({info: suite.info, result: Success([])});
 				}
 			});
@@ -99,12 +101,20 @@ class Runner {
 					.next(function(_) {
 						var assertions = [];
 						return caze.execute()
-							.forEachAsync(function(a) {
+							#if pure .forEach #else .forEachAsync #end(function(a) {
 								assertions.push(a);
-								return reporter.report(Assertion(a)).map(function(_) return true);
+								return reporter.report(Assertion(a)).map(function(_) return #if pure Resume #else true #end);
 							})
-							.map(function(_) return assertions)
-							.timeout(caze.timeout, timers, caze.pos);
+							#if pure
+							.next(function(o):Outcome<Array<Assertion>, Error> return switch o {
+								case Depleted: Success(assertions);
+								case Halted(_): throw 'unreachable';
+								case Failed(e): Failure(e);
+							})
+							#else
+							.next(function(_) return assertions)
+							#end
+							.timeout(caze.timeout, timers);
 					})
 					.next(function(result) return suite.after().timeout(caze.timeout, timers, caze.pos).next(function(_) return result))
 					.handle(function(result) {
