@@ -85,6 +85,7 @@ class Runner {
 					});
 					
 				} else {
+					// skip startup and shutdown
 					cb({info: suite.info, result: Success([])});
 				}
 			});
@@ -99,15 +100,19 @@ class Runner {
 					.next(function(_) {
 						var assertions = [];
 						return caze.execute()
-							.forEach(function(a) {
+							#if pure .forEach #else .forEachAsync #end(function(a) {
 								assertions.push(a);
-								return reporter.report(Assertion(a)).map(function(_) return Resume);
+								return reporter.report(Assertion(a)).map(function(_) return #if pure Resume #else true #end);
 							})
+							#if pure
 							.next(function(o):Outcome<Array<Assertion>, Error> return switch o {
 								case Depleted: Success(assertions);
 								case Halted(_): throw 'unreachable';
 								case Failed(e): Failure(e);
 							})
+							#else
+							.next(function(_) return assertions)
+							#end
 							.timeout(caze.timeout, timers);
 					})
 					.next(function(result) return suite.after().timeout(caze.timeout, timers).next(function(_) return result))

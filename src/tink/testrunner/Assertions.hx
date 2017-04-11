@@ -5,7 +5,7 @@ import haxe.PosInfos;
 
 using tink.CoreApi;
 
-private typedef Impl = Stream<Assertion, Error>;
+private typedef Impl = Stream<Assertion #if pure , Error #end>;
 
 @:forward
 abstract Assertions(Impl) from Impl to Impl {
@@ -44,6 +44,6 @@ abstract Assertions(Impl) from Impl to Impl {
 	
 	@:from
 	public static inline function ofSurpriseAssertions(p:Surprise<Assertions, Error>):Assertions {
-		return Stream.promise((p:Surprise<Impl, Error>));
+		return Stream #if pure .promise #else .later #end ((p:Surprise<Impl, Error>));
 	}
 }
