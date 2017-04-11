@@ -6,8 +6,8 @@
   "contributors": [
     "kevinresol"
   ],
-  "releasenote": "Nicer output",
-  "version": "0.5.3",
+  "releasenote": "Cater for pure branch",
+  "version": "0.5.4",
   "url": "https://github.com/haxetink/tink_testrunner/",
   "dependencies": {
     "ansi": "",
