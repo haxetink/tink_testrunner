@@ -6,8 +6,8 @@
   "contributors": [
     "kevinresol"
   ],
-  "releasenote": "Cater for pure branch",
-  "version": "0.5.4",
+  "releasenote": "Sys.exit on nodejs",
+  "version": "0.5.5",
   "url": "https://github.com/haxetink/tink_testrunner/",
   "dependencies": {
     "ansi": "",
