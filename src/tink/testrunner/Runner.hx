@@ -14,7 +14,7 @@ class Runner {
 	
 	public static function exit(result:BatchResult)
 		#if travix travix.Logger.exit
-		#elseif sys Sys.exit
+		#elseif (sys || nodejs) Sys.exit
 		#else #error "not supported"
 		#end (result.summary().failures.length);
 	
