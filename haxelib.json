@@ -6,8 +6,8 @@
   "contributors": [
     "kevinresol"
   ],
-  "releasenote": "Sys.exit on nodejs",
-  "version": "0.5.5",
+  "releasenote": "More helper casts for Assertions",
+  "version": "0.5.6",
   "url": "https://github.com/haxetink/tink_testrunner/",
   "dependencies": {
     "ansi": "",
