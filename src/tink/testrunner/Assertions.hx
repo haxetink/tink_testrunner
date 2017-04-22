@@ -28,6 +28,11 @@ abstract Assertions(Impl) from Impl to Impl {
 	}
 	
 	@:from
+	public static function ofFutureAssertions(p:Future<Assertions>):Assertions {
+		return p.map(Success);
+	}
+	
+	@:from
 	public static function ofSurpriseAssertion(p:Surprise<Assertion, Error>):Assertions {
 		return p >> function(o:Assertion) return ofAssertion(o);
 	}
