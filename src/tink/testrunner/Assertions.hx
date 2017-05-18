@@ -60,6 +60,17 @@ abstract Assertions(Impl) from Impl to Impl {
 	
 	@:from
 	public static inline function ofSurpriseAssertions(p:Surprise<Assertions, Error>):Assertions {
-		return Stream #if pure .promise #else .later #end ((p:Surprise<Impl, Error>));
+		#if pure
+			#if java // HACK: somehow this passes the java native compilation
+			return Stream.flatten(p.map(function(o):Stream<Dynamic, Dynamic> return switch o {
+				case Success(a): (a:Stream<Assertion, Error>);
+				case Failure(e): Stream.ofError(e);
+			}));
+			#else
+			return Stream.promise((p:Surprise<Impl, Error>));
+			#end
+		#else
+		return Stream.later((p:Surprise<Impl, Error>));
+		#end
 	}
 }
