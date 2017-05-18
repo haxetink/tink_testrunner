@@ -27,7 +27,7 @@ abstract AssertionResult(Outcome<Noise, String>) from Outcome<Noise, String> to 
 	public static function ofOutcome<T>(v:Outcome<T, Error>):AssertionResult
 		return switch v {
 			case Success(_): Success(Noise);
-			case Failure(e): Failure(e.message);
+			case Failure(e): Failure('${e.toString()} ${e.data}');
 		}
 		
 	@:to
