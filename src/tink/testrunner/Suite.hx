@@ -28,10 +28,10 @@ typedef SuiteInfo = {
 interface SuiteObject {
 	var info:SuiteInfo;
 	var cases:Array<Case>;
-	function startup():Promise<Noise>;
+	function setup():Promise<Noise>;
 	function before():Promise<Noise>;
 	function after():Promise<Noise>;
-	function shutdown():Promise<Noise>;
+	function teardown():Promise<Noise>;
 }
 
 class BasicSuite implements SuiteObject {
@@ -45,8 +45,8 @@ class BasicSuite implements SuiteObject {
 		this.cases = cases;
 	}
 	
-	public function startup() return STUB;
+	public function setup() return STUB;
 	public function before() return STUB;
 	public function after() return STUB;
-	public function shutdown() return STUB;
+	public function teardown() return STUB;
 }

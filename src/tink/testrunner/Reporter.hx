@@ -120,8 +120,8 @@ class BasicReporter implements Reporter {
 			
 				switch result.result {
 					case Success(_): // ok
-					case StartupFailed(e): println(formatter.error(indent('Startup Failed: ${e.toString()}', 2)));
-					case ShutdownFailed(e, _): println(formatter.error(indent('Shutdown Failed: ${e.toString()}', 2)));
+					case SetupFailed(e): println(formatter.error(indent('Setup Failed: ${e.toString()}', 2)));
+					case TeardownFailed(e, _): println(formatter.error(indent('Teardown Failed: ${e.toString()}', 2)));
 				}
 				
 			case BatchFinish(result):

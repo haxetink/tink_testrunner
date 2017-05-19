@@ -71,22 +71,22 @@ class Runner {
 								next();
 							});
 						} else {
-							suite.shutdown().handle(function(o) cb({
+							suite.teardown().handle(function(o) cb({
 								info: suite.info,
 								result: switch o {
 									case Success(_): Success(results);
-									case Failure(e): ShutdownFailed(e, results);
+									case Failure(e): TeardownFailed(e, results);
 								}
 							}));
 						}
 					}
-					suite.startup().handle(function(o) switch o {
+					suite.setup().handle(function(o) switch o {
 						case Success(_): next();
-						case Failure(e): cb({info: suite.info, result: StartupFailed(e)});
+						case Failure(e): cb({info: suite.info, result: SetupFailed(e)});
 					});
 					
 				} else {
-					// skip startup and shutdown
+					// skip setup and teardown
 					cb({info: suite.info, result: Success([])});
 				}
 			});
@@ -173,9 +173,9 @@ abstract BatchResult(Array<SuiteResult>) from Array<SuiteResult> to Array<SuiteR
 		for(s in this) switch s.result {
 			case Success(cases):
 				handleCases(cases);
-			case StartupFailed(e):
+			case SetupFailed(e):
 				ret.failures.push(SuiteFailed(e));
-			case ShutdownFailed(e, cases): 
+			case TeardownFailed(e, cases): 
 			 	handleCases(cases);
 				ret.failures.push(SuiteFailed(e));
 		}
@@ -196,8 +196,8 @@ typedef CaseResult = {
 
 enum SuiteResultType {
 	Success(cases:Array<CaseResult>);
-	StartupFailed(e:Error);
-	ShutdownFailed(e:Error, cases:Array<CaseResult>);
+	SetupFailed(e:Error);
+	TeardownFailed(e:Error, cases:Array<CaseResult>);
 }
 
 enum FailureType {
