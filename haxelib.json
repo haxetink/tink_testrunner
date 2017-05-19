@@ -6,8 +6,8 @@
   "contributors": [
     "kevinresol"
   ],
-  "releasenote": "Fix java",
-  "version": "0.5.7",
+  "releasenote": "Rename startup->setup & shutdown->teardown",
+  "version": "0.6.0",
   "url": "https://github.com/haxetink/tink_testrunner/",
   "dependencies": {
     "ansi": "",
