@@ -23,25 +23,25 @@ abstract Assertions(Stream<Assertion>) from Stream<Assertion> to Stream<Assertio
 ```
 
 
-## Assertion Buffer
+## Stream
 
-One can also use an [`AssertionBuffer`](basics/multi-assertions.md#assertion-buffer):
+One can also use `Accumulator` from `tink_streams`:
 
 ```haxe
 public function async() {
-	var asserts = new AssertionBuffer();
+	var asserts = new Accumulator();
 	var asyncTask().handle(function(o) {
-		asserts.assert(o == 'async');
-		asserts.done();
+		asserts.yield(new Assertion(o == 'async'));
+		return asserts.yield(End);
 	});
 	return asserts;
 }
 ```
 
-When using an `AssertionBuffer`, remember to call `done()` on it when the tests are done,
+When using a Stream, remember to end the stream when the tests are done,
 otherwise the tests will never finish and causes a [timeout](#timeout).
 
-### Return the buffer (assertion stream) ASAP
+### Return the Stream instance ASAP
 
 Although the `Assertions` abstract provides implicit casts for Future/Promise of `Assertions`,
 it is recommended to return the `Assertions` (or `Stream<Assertion>`) as soon as possible.
@@ -50,10 +50,10 @@ Consider the following:
 
 ```haxe
 public function async() {
-	var asserts = new AssertionBuffer();
-	return asyncTask().map(function(o) {
-		asserts.assert(o == 'async');
-		return asserts.done();
+	var asserts = new Accumulator();
+	return asyncTask().map(function(o):Assertions {
+		asserts.yield(new Assertion(o == 'async'));
+		return asserts.yield(End);
 	});
 }
 ```
@@ -61,13 +61,13 @@ public function async() {
 This piece of code looks very similar to the previous one, and they are both valid thanks to the implicit casts.
 But there is a fundamental difference:
 
-- The previous code returns the buffer (assertion stream) synchronously and emits the assertion value later
-- The code in this section returns a future where the buffer is resolved only after the assertion value is emitted
+- The previous code returns the stream (assertion stream) synchronously and emits the assertion value later
+- The code in this section returns a future where the stream is resolved only after the assertion value is emitted
 
 This might not be a big deal in this particular example. But consider a long-runner async tests with a number of assertions,
-the test runner in the previous case will get the buffer immediately, allowing it to report the assertion results as soon
+the test runner in the previous case will get the stream immediately, allowing it to report the assertion results as soon
 as they are emitted, thus the reporting will be more responsive. For the latter case, the test runner only gain access
-to the buffer after all the assertion values has already been produced. This make the reporting "halts" until the buffer 
+to the stream after all the assertion values has already been produced. This make the reporting "halts" until the stream 
 future is resolved then all assertion results suddenly flood the reporter.
 
 

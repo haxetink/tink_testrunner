@@ -19,30 +19,6 @@ abstract Assertions(Stream<Assertion>) from Stream<Assertion> to Stream<Assertio
 
 In other words, one can return an array of assertion and let the compiler do the cast job.
 
-## Assertion Buffer
+## Stream
 
-The other way is to use the provided `AssertionBuffer` class:
-
-```haxe
-public function test() {
-	var asserts = new AssertionBuffer();
-	asserts.assert(true);
-	asserts.assert(true);
-	return asserts.done();
-}
-```
-
-### Injecting Assertion Buffer Automagically
-
-Tag your test class with `@:asserts` and then an `AssertionBuffer` instance will be injected
-into all tests methods automatically.
-
-```haxe
-@:asserts
-class MyClass {
-	public function test() {
-		asserts.assert(true);
-		return asserts.done();
-	}
-}
-```
+One can also use stream directly to produce mutliple assertions. [See more here](basics/async-tests.md#stream).
