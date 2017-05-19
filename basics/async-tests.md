@@ -73,12 +73,16 @@ future is resolved then all assertion results suddenly flood the reporter.
 
 ## Timeout
 
-To set a timeout on a test, one can tag the test method with the `@:timeout` metadata:
+To set a timeout on a test, one can set the `timeout` value in the `Case` instance
 
 ```haxe
-@:timeout(1000) // timeout in 1000 ms
-public function async() {...}
+class TimeoutCase extends BasicCase {
+	public function new() {
+		super();
+		timeout = 10000; // in ms
+	}
+	override function execute():Assertions {
+		// ...
+	}
+}
 ```
-
-The default timeout value is 5000ms. One can also tag the metadata at class level so that the timeout
-is applied to all test methods in that class.

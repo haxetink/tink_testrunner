@@ -43,6 +43,8 @@ interface Case {
 }
 ```
 
+[Read more...](basics/case.md)
+
 ## Suite
 
 A collection of Cases.
@@ -54,12 +56,14 @@ so the actual implementation looks like this:
 interface Suite {
 	var info:SuiteInfo; // meta info
 	var cases:Array<Case>;
-	function startup():Promise<Noise>; // to be run once before all cases
+	function setup():Promise<Noise>; // to be run once before all cases
 	function before():Promise<Noise>; // to be run before each cases
 	function after():Promise<Noise>; // to be run after each cases
-	function shutdown():Promise<Noise>; // to be run once after all cases
+	function teardown():Promise<Noise>; // to be run once after all cases
 }
 ```
+
+[Read more...](basics/suite.md)
 
 ## Batch
 
@@ -71,9 +75,12 @@ This time it is really just `Array<Suite>`.
 
 A Runner will take a Batch and run it, then emits the results to a reporter.
 
+[Read more...](basics/runner.md)
+
 ## Reporter
 
 A Reporter reports the progress of a Runner to user. There is not much to say about it.
 
+[Read more...](basics/reporter.md)
 
 
