@@ -28,9 +28,6 @@ class RunTests {
 		
 		// Test: cast from single case
 		var single = new SingleCase();
-		var future = new FutureCase();
-		var promise = new PromiseCase();
-		var surprises = new SurprisesCase();
 		futures.push(
 			function() return Runner.run(single).map(function(result) {
 				assertEquals(0, result.summary().failures.length);
@@ -40,7 +37,15 @@ class RunTests {
 		
 		// Test: cast from multiple cases
 		futures.push(
-			function() return Runner.run([single, future, promise, surprises]).map(function(result) {
+			function() return Runner.run([
+				single, 
+				new FutureCase(),
+				new PromiseCase(),
+				new SurpriseCase(),
+				new FuturesCase(),
+				new PromisesCase(),
+				new SurprisesCase(),
+			]).map(function(result) {
 				assertEquals(0, result.summary().failures.length);
 				return Noise;
 			})
@@ -71,6 +76,21 @@ class FutureCase extends BasicCase {
 class PromiseCase extends BasicCase {
 	override function execute():Assertions {
 		return (new Assertion(true, 'Dummy'):Promise<Assertion>);
+	}
+}
+class SurpriseCase extends BasicCase {
+	override function execute():Assertions {
+		return Future.sync(Success(new Assertion(true, 'Dummy')));
+	}
+}
+class FuturesCase extends BasicCase {
+	override function execute():Assertions {
+		return Future.sync((new Assertion(true, 'Dummy'):Assertions));
+	}
+}
+class PromisesCase extends BasicCase {
+	override function execute():Assertions {
+		return ((new Assertion(true, 'Dummy'):Assertions):Promise<Assertions>);
 	}
 }
 class SurprisesCase extends BasicCase {
