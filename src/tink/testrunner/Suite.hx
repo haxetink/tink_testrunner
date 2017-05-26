@@ -35,8 +35,6 @@ interface SuiteObject {
 }
 
 class BasicSuite implements SuiteObject {
-	static var STUB:Promise<Noise> = Future.sync(Success(Noise));
-	
 	public var info:SuiteInfo;
 	public var cases:Array<Case>;
 	
@@ -45,8 +43,8 @@ class BasicSuite implements SuiteObject {
 		this.cases = cases;
 	}
 	
-	public function setup() return STUB;
-	public function before() return STUB;
-	public function after() return STUB;
-	public function teardown() return STUB;
+	public function setup() return Promise.NOISE;
+	public function before() return Promise.NOISE;
+	public function after() return Promise.NOISE;
+	public function teardown() return Promise.NOISE;
 }

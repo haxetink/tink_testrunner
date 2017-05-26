@@ -1,4 +1,4 @@
 tests.hxml
 
--lib tink_unittest
+-lib tink_testrunner
 -lib travix
