@@ -14,6 +14,7 @@ class Runner {
 	
 	public static function exit(result:BatchResult)
 		#if travix travix.Logger.exit
+		#elseif air untyped __global__["flash.desktop.NativeApplication"].nativeApplication.exit
 		#elseif (sys || nodejs) Sys.exit
 		#else #error "not supported"
 		#end (result.summary().failures.length);
