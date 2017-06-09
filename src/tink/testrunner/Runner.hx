@@ -21,10 +21,11 @@ class Runner {
 	public static function run(batch:Batch, ?reporter:Reporter, ?timers:TimerManager):Future<BatchResult> {
 		
 		if(reporter == null) reporter = new BasicReporter();
-		if(timers == null)
+		if(timers == null) {
 			#if ((haxe_ver >= 3.3) || flash || js || openfl)
 				timers = new HaxeTimerManager();
 			#end
+		}
 			
 		var includeMode = false;
 		for(s in batch.suites) {
