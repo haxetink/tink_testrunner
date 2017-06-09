@@ -16,16 +16,17 @@ class Runner {
 		#if travix travix.Logger.exit
 		#elseif air untyped __global__["flash.desktop.NativeApplication"].nativeApplication.exit
 		#elseif (sys || nodejs) Sys.exit
-		#else #error "not supported"
+		#else throw "not supported";
 		#end (result.summary().failures.length);
 	
 	public static function run(batch:Batch, ?reporter:Reporter, ?timers:TimerManager):Future<BatchResult> {
 		
 		if(reporter == null) reporter = new BasicReporter();
-		if(timers == null)
+		if(timers == null) {
 			#if ((haxe_ver >= 3.3) || flash || js || openfl)
 				timers = new HaxeTimerManager();
 			#end
+		}
 			
 		var includeMode = false;
 		for(s in batch.suites) {
