@@ -168,7 +168,7 @@ class BasicReporter implements Reporter {
 	function println(v:String)
 		#if travix
 			travix.Logger.println(v);
-		#elseif air
+		#elseif (air || air3)
 			flash.Lib.trace(v);
 		#elseif (sys || nodejs)
 			Sys.println(v);
