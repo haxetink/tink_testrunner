@@ -15,7 +15,7 @@ class Runner {
 	public static function exit(result:BatchResult)
 		#if travix travix.Logger.exit
 		#elseif (sys || nodejs) Sys.exit
-		#else #error "not supported"
+		#else throw "not supported";
 		#end (result.summary().failures.length);
 	
 	public static function run(batch:Batch, ?reporter:Reporter, ?timers:TimerManager):Future<BatchResult> {

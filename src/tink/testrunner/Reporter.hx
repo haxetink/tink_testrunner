@@ -171,7 +171,7 @@ class BasicReporter implements Reporter {
 		#elseif (sys || nodejs)
 			Sys.println(v);
 		#else
-			#error "Not supported yet"
+			throw "Not supported yet";
 		#end
 	
 	function indent(v:String, i = 0) {
