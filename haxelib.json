@@ -1,17 +1,17 @@
 {
-  "name": "tink_testrunner",
-  "license": "MIT",
-  "tags": [],
-  "classPath": "src",
-  "contributors": [
-    "kevinresol"
-  ],
-  "releasenote": "Rename startup->setup & shutdown->teardown",
-  "version": "0.6.1",
-  "url": "https://github.com/haxetink/tink_testrunner/",
-  "dependencies": {
-    "ansi": "",
-    "tink_streams": "",
-    "tink_macro": ""
-  }
+	"name": "tink_testrunner",
+	"license": "MIT",
+	"tags": [],
+	"classPath": "src",
+	"contributors": [
+		"kevinresol"
+	],
+	"releasenote": "Support AIR",
+	"version": "0.6.1",
+	"url": "https://github.com/haxetink/tink_testrunner/",
+	"dependencies": {
+		"ansi": "",
+		"tink_macro": "",
+		"tink_streams": ""
+	}
 }
