@@ -6,8 +6,8 @@
 	"contributors": [
 		"kevinresol"
 	],
-	"releasenote": "Support AIR",
-	"version": "0.6.1",
+	"releasenote": "Support PhantomJS",
+	"version": "0.6.2",
 	"url": "https://github.com/haxetink/tink_testrunner/",
 	"dependencies": {
 		"ansi": "",
