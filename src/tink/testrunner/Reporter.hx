@@ -172,6 +172,8 @@ class BasicReporter implements Reporter {
 			flash.Lib.trace(v);
 		#elseif (sys || nodejs)
 			Sys.println(v);
+		#elseif (js)
+			js.Browser.window.console.log(v);
 		#else
 			throw "Not supported yet";
 		#end
