@@ -12,13 +12,14 @@ using tink.CoreApi;
 
 class Runner {
 	
-	public static function exit(result:BatchResult)
+	public static function exit(result:BatchResult) {
 		#if travix travix.Logger.exit
 		#elseif (air || air3) untyped __global__["flash.desktop.NativeApplication"].nativeApplication.exit
 		#elseif (sys || nodejs) Sys.exit
 		#elseif (phantomjs) untyped __js__('phantom').exit
 		#else throw "not supported";
 		#end (result.summary().failures.length);
+	}
 	
 	public static function run(batch:Batch, ?reporter:Reporter, ?timers:TimerManager):Future<BatchResult> {
 		
