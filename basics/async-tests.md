@@ -32,7 +32,7 @@ public function async() {
 	var asserts = new Accumulator();
 	var asyncTask().handle(function(o) {
 		asserts.yield(new Assertion(o == 'async'));
-		return asserts.yield(End);
+		asserts.yield(End);
 	});
 	return asserts;
 }
@@ -53,7 +53,8 @@ public function async() {
 	var asserts = new Accumulator();
 	return asyncTask().map(function(o):Assertions {
 		asserts.yield(new Assertion(o == 'async'));
-		return asserts.yield(End);
+		asserts.yield(End);
+		return asserts;
 	});
 }
 ```
