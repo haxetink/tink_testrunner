@@ -6,8 +6,8 @@
 	"contributors": [
 		"kevinresol"
 	],
-	"releasenote": "Fix compilation for unsupported targets",
-	"version": "0.6.3",
+	"releasenote": "Flash fixes",
+	"version": "0.6.4",
 	"url": "https://github.com/haxetink/tink_testrunner/",
 	"dependencies": {
 		"ansi": "",
