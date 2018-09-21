@@ -65,7 +65,7 @@ But there is a fundamental difference:
 - The previous code returns the stream (assertion stream) synchronously and emits the assertion value later
 - The code in this section returns a future where the stream is resolved only after the assertion value is emitted
 
-This might not be a big deal in this particular example. But consider a long-runner async tests with a number of assertions,
+This might not be a big deal in this particular example. But consider a long-running async tests with a number of assertions,
 the test runner in the previous case will get the stream immediately, allowing it to report the assertion results as soon
 as they are emitted, thus the reporting will be more responsive. For the latter case, the test runner only gain access
 to the stream after all the assertion values has already been produced. This make the reporting "halts" until the stream 
