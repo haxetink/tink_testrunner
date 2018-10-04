@@ -147,7 +147,7 @@ class TimeoutHelper {
 			});
 			if(!done && timers != null) {
 				timer = timers.schedule(ms, function() {
-					link.dissolve();
+					link.cancel();
 					cb(Failure(new Error('Timed out after $ms ms', pos)));
 				});
 			}
