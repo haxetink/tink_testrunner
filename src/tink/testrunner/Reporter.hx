@@ -113,15 +113,15 @@ class BasicReporter implements Reporter {
 				switch results {
 					case Success(_):
 					case Failure(e):
-						println(formatter.error(indent('- ${e.toString()}', 4)));
+						println(formatter.error(indent('- ${formatError(e)}', 4)));
 			}
 				
 			case SuiteFinish(result):
 			
 				switch result.result {
 					case Success(_): // ok
-					case SetupFailed(e): println(formatter.error(indent('Setup Failed: ${e.toString()}', 2)));
-					case TeardownFailed(e, _): println(formatter.error(indent('Teardown Failed: ${e.toString()}', 2)));
+					case SetupFailed(e): println(formatter.error(indent('Setup Failed: ${formatError(e)}', 2)));
+					case TeardownFailed(e, _): println(formatter.error(indent('Teardown Failed: ${formatError(e)}', 2)));
 				}
 				
 			case BatchFinish(result):
@@ -182,5 +182,11 @@ class BasicReporter implements Reporter {
 		return v.split('\n')
 			.map(function(line) return ''.lpad(' ', i) + line)
 			.join('\n');
+	}
+	
+	function formatError(e:Error) {
+		var str = e.toString();
+		if(e.data != null) str += '\n' + Std.string(e.data);
+		return str;
 	}
 }
