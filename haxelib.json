@@ -6,8 +6,8 @@
 	"contributors": [
 		"kevinresol"
 	],
-	"releasenote": "Flash fixes",
-	"version": "0.6.4",
+	"releasenote": "Update deprecated API",
+	"version": "0.6.5",
 	"url": "https://github.com/haxetink/tink_testrunner/",
 	"dependencies": {
 		"ansi": "",
