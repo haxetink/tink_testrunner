@@ -25,14 +25,15 @@ abstract Assertions(Stream<Assertion>) from Stream<Assertion> to Stream<Assertio
 
 ## Stream
 
-One can also use `Accumulator` from `tink_streams`:
+One can also use `SignalStream` from `tink_streams`:
 
 ```haxe
 public function async() {
-	var asserts = new Accumulator();
+        var signal = Signal.trigger();
+        var asserts = new SignalStream(signal.asSignal());
 	var asyncTask().handle(function(o) {
-		asserts.yield(new Assertion(o == 'async'));
-		asserts.yield(End);
+		asserts.trigger(Data(new Assertion(o == 'async')));
+		asserts.trigger(End);
 	});
 	return asserts;
 }
@@ -50,10 +51,11 @@ Consider the following:
 
 ```haxe
 public function async() {
-	var asserts = new Accumulator();
+        var signal = Signal.trigger();
+        var asserts = new SignalStream(signal.asSignal());
 	return asyncTask().map(function(o):Assertions {
-		asserts.yield(new Assertion(o == 'async'));
-		asserts.yield(End);
+		asserts.trigger(Data(new Assertion(o == 'async')));
+		asserts.trigger(End);
 		return asserts;
 	});
 }
