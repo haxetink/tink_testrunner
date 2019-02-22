@@ -75,7 +75,7 @@ class Runner {
 				function next() {
 					if(iter.hasNext()) {
 						var caze = iter.next();
-						runCase(caze, suite, reporter, timers, includeMode).handle(function(r) {
+						runCase(caze, suite, reporter, timers, caze.shouldRun(includeMode)).handle(function(r) {
 							results.push(r);
 							next();
 						});
@@ -97,10 +97,10 @@ class Runner {
 		});
 	}
 	
-	static function runCase(caze:Case, suite:Suite, reporter:Reporter, timers:TimerManager, includeMode:Bool):Future<CaseResult> {
+	static function runCase(caze:Case, suite:Suite, reporter:Reporter, timers:TimerManager, shouldRun:Bool):Future<CaseResult> {
 		return Future.async(function(cb) {
-			if(caze.shouldRun(includeMode)) {
-				reporter.report(CaseStart(caze.info, true)).handle(function(_) {
+			if(shouldRun) {
+				reporter.report(CaseStart(caze.info, shouldRun)).handle(function(_) {
 					suite.before().timeout(caze.timeout, timers, caze.pos)
 						.next(function(_) {
 							var assertions = [];
@@ -128,7 +128,7 @@ class Runner {
 						});
 				});
 			} else {
-				reporter.report(CaseStart(caze.info, false))
+				reporter.report(CaseStart(caze.info, shouldRun))
 					.handle(function(_) {
 						var results = {
 							info: caze.info,
