@@ -6,8 +6,8 @@
 	"contributors": [
 		"kevinresol"
 	],
-	"releasenote": "Update deprecated API",
-	"version": "0.6.5",
+	"releasenote": "[breaking] Report excluded cases",
+	"version": "0.7.0",
 	"url": "https://github.com/haxetink/tink_testrunner/",
 	"dependencies": {
 		"ansi": "",
