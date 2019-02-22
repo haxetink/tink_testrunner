@@ -63,37 +63,36 @@ class Runner {
 	
 	static function runSuite(suite:Suite, reporter:Reporter, timers:TimerManager, includeMode:Bool):Future<SuiteResult> {
 		return Future.async(function(cb) {
-			reporter.report(SuiteStart(suite.info)).handle(function(_) {
-				var cases = suite.cases.filter(function(c) return !c.exclude && (!includeMode || c.include));
-				if(cases.length > 0) {
-					var iter = cases.iterator();
-					var results = [];
-					function next() {
-						if(iter.hasNext()) {
-							var caze = iter.next();
-							runCase(caze, suite, reporter, timers).handle(function(r) {
-								results.push(r);
-								next();
-							});
-						} else {
-							suite.teardown().handle(function(o) cb({
-								info: suite.info,
-								result: switch o {
-									case Success(_): Success(results);
-									case Failure(e): TeardownFailed(e, results);
-								}
-							}));
-						}
+			var cases = suite.getCasesToBeRun(includeMode);
+			var hasCases = cases.length > 0;
+			reporter.report(SuiteStart(suite.info, hasCases)).handle(function(_) {
+				
+				function setup() return hasCases ? suite.setup() : Promise.NOISE;
+				function teardown() return hasCases ? suite.teardown() : Promise.NOISE;
+				
+				var iter = cases.iterator();
+				var results = [];
+				function next() {
+					if(iter.hasNext()) {
+						var caze = iter.next();
+						runCase(caze, suite, reporter, timers).handle(function(r) {
+							results.push(r);
+							next();
+						});
+					} else {
+						teardown().handle(function(o) cb({
+							info: suite.info,
+							result: switch o {
+								case Success(_): Success(results);
+								case Failure(e): TeardownFailed(e, results);
+							}
+						}));
 					}
-					suite.setup().handle(function(o) switch o {
-						case Success(_): next();
-						case Failure(e): cb({info: suite.info, result: SetupFailed(e)});
-					});
-					
-				} else {
-					// skip setup and teardown
-					cb({info: suite.info, result: Success([])});
 				}
+				setup().handle(function(o) switch o {
+					case Success(_): next();
+					case Failure(e): cb({info: suite.info, result: SetupFailed(e)});
+				});
 			});
 		});
 	}

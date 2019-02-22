@@ -19,6 +19,10 @@ abstract Suite(SuiteObject) from SuiteObject to SuiteObject {
 	@:from
 	public static inline function ofCase(caze:Case):Suite
 		return ofCases([caze]);
+		
+	public function getCasesToBeRun(includeMode:Bool) {
+		return this.cases.filter(function(c) return c.shouldRun(includeMode));
+	}
 }
 
 typedef SuiteInfo = {

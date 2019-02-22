@@ -14,7 +14,7 @@ interface Reporter {
 
 enum ReportType {
 	BatchStart;
-	SuiteStart(info:SuiteInfo);
+	SuiteStart(info:SuiteInfo, hasCasesToRun:Bool);
 	CaseStart(info:CaseInfo);
 	Assertion(assertion:Assertion);
 	CaseFinish(result:CaseResult);
@@ -85,9 +85,11 @@ class BasicReporter implements Reporter {
 		switch type {
 			case BatchStart:
 				
-			case SuiteStart(info):
-				println(' ');
-				println(formatter.info(info.name));
+			case SuiteStart(info, hasCasesToRun):
+				if(hasCasesToRun) {
+					println(' ');
+					println(formatter.info(info.name));
+				}
 				
 			case CaseStart(info):
 				var m = formatter.info(indent(info.name, 2)) + ': ';

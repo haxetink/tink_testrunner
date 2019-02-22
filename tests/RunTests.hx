@@ -3,6 +3,7 @@ package;
 import tink.testrunner.*;
 import tink.testrunner.Assertion.*;
 import tink.testrunner.Case;
+import tink.testrunner.Suite;
 import travix.Logger.*;
 
 using tink.CoreApi;
@@ -41,6 +42,21 @@ class RunTests {
 				new FuturesCase(),
 				new PromisesCase(),
 				new SurprisesCase(),
+			]).map(function(result) {
+				assertEquals(0, result.summary().failures.length);
+				return Noise;
+			})
+		);
+		
+		// Test: empty suite (reporter should not print the empty suite)
+		futures.push(
+			function() return Runner.run([
+				new BasicSuite({name: 'SingleSuite'}, [
+					single,
+				]),
+				new BasicSuite({name: 'EmptySuite'}, [
+					new ExcludedCase(),
+				]),
 			]).map(function(result) {
 				assertEquals(0, result.summary().failures.length);
 				return Noise;
@@ -92,5 +108,14 @@ class PromisesCase extends BasicCase {
 class SurprisesCase extends BasicCase {
 	override function execute():Assertions {
 		return Future.sync(Success((new Assertion(true, 'Dummy'):Assertions)));
+	}
+}
+class ExcludedCase extends BasicCase {
+	public function new() {
+		super();
+		exclude = true;
+	}
+	override function execute():Assertions {
+		return new Assertion(true, 'Dummy');
 	}
 }
