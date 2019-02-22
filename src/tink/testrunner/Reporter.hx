@@ -15,7 +15,7 @@ interface Reporter {
 enum ReportType {
 	BatchStart;
 	SuiteStart(info:SuiteInfo, hasCasesToRun:Bool);
-	CaseStart(info:CaseInfo);
+	CaseStart(info:CaseInfo, shouldRun:Bool);
 	Assertion(assertion:Assertion);
 	CaseFinish(result:CaseResult);
 	SuiteFinish(result:SuiteResult);
@@ -91,11 +91,13 @@ class BasicReporter implements Reporter {
 					println(formatter.info(info.name));
 				}
 				
-			case CaseStart(info):
-				var m = formatter.info(indent(info.name, 2)) + ': ';
-				if(info.pos != null) m += formatter.extra('[${info.pos.fileName}:${info.pos.lineNumber}] ');
-				if(info.description != null) m += formatter.mute(info.description);
-				println(m);
+			case CaseStart(info, shouldRun):
+				if(shouldRun) {
+					var m = formatter.info(indent(info.name, 2)) + ': ';
+					if(info.pos != null) m += formatter.extra('[${info.pos.fileName}:${info.pos.lineNumber}] ');
+					if(info.description != null) m += formatter.mute(info.description);
+					println(m);
+				}
 				
 			case Assertion(assertion):
 			
@@ -111,11 +113,11 @@ class BasicReporter implements Reporter {
 				println(m);
 				if(failure != null) println(formatter.error(indent(failure, 8)));
 				
-			case CaseFinish({results: results}):
-				switch results {
-					case Success(_):
-					case Failure(e):
+			case CaseFinish({result: result}):
+				switch result {
+					case Failed(e):
 						println(formatter.error(indent('- ${formatError(e)}', 4)));
+					case _:
 			}
 				
 			case SuiteFinish(result):

@@ -4,10 +4,11 @@ import tink.testrunner.*;
 import tink.testrunner.Assertion.*;
 import tink.testrunner.Case;
 import tink.testrunner.Suite;
+import tink.testrunner.Reporter;
 import travix.Logger.*;
 
 using tink.CoreApi;
-
+using Lambda;
 
 class RunTests {
 	static function main() {
@@ -49,6 +50,7 @@ class RunTests {
 		);
 		
 		// Test: empty suite (reporter should not print the empty suite)
+		var reporter = new MemoryReporter();
 		futures.push(
 			function() return Runner.run([
 				new BasicSuite({name: 'SingleSuite'}, [
@@ -57,8 +59,20 @@ class RunTests {
 				new BasicSuite({name: 'EmptySuite'}, [
 					new ExcludedCase(),
 				]),
-			]).map(function(result) {
+				new BasicSuite({name: 'MixedSuite'}, [
+					single,
+					new ExcludedCase(),
+				]),
+			], reporter).map(function(result) {
 				assertEquals(0, result.summary().failures.length);
+				assertEquals(3, reporter.logs.filter(function(t) return t.match(SuiteStart(_))).length);
+				assertEquals(true, reporter.logs.exists(function(t) return t.match(SuiteStart({name: 'SingleSuite'}, true))));
+				assertEquals(true, reporter.logs.exists(function(t) return t.match(SuiteStart({name: 'EmptySuite'}, false))));
+				assertEquals(true, reporter.logs.exists(function(t) return t.match(SuiteStart({name: 'MixedSuite'}, true))));
+				assertEquals(2, reporter.logs.filter(function(t) return t.match(CaseStart({name: 'SingleCase'}, true))).length);
+				assertEquals(2, reporter.logs.filter(function(t) return t.match(CaseStart({name: 'ExcludedCase'}, false))).length);
+				assertEquals(2, reporter.logs.filter(function(t) return t.match(CaseFinish({info: {name: 'SingleCase'}, result: Succeeded(_)}))).length);
+				assertEquals(2, reporter.logs.filter(function(t) return t.match(CaseFinish({info: {name: 'ExcludedCase'}, result: Excluded}))).length);
 				return Noise;
 			})
 		);
@@ -117,5 +131,17 @@ class ExcludedCase extends BasicCase {
 	}
 	override function execute():Assertions {
 		return new Assertion(true, 'Dummy');
+	}
+}
+
+class MemoryReporter implements Reporter {
+	
+	public var logs:Array<ReportType> = [];
+	
+	public function new() {}
+	
+	public function report(type:ReportType):Future<Noise> {
+		logs.push(type);
+		return Future.NOISE;
 	}
 }
