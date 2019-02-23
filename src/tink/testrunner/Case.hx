@@ -1,15 +1,17 @@
 package tink.testrunner;
 
 import haxe.PosInfos;
+import tink.testrunner.Suite;
 
 @:forward
 abstract Case(CaseObject) from CaseObject to CaseObject {
-	public inline function shouldRun(includeMode:Bool):Bool {
+	public function shouldRun(includeMode:Bool):Bool {
 		return !this.exclude && (!includeMode || this.include);
 	}
 }
 
 interface CaseObject {
+	var suite:Suite;
 	var info:CaseInfo;
 	var timeout:Int;
 	var include:Bool;
@@ -25,6 +27,7 @@ typedef CaseInfo = {
 }
 
 class BasicCase implements CaseObject {
+	public var suite:Suite;
 	public var info:CaseInfo;
 	public var timeout:Int = 5000;
 	public var include:Bool = false;

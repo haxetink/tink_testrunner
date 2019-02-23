@@ -45,6 +45,7 @@ class BasicSuite implements SuiteObject {
 	public function new(info, cases) {
 		this.info = info;
 		this.cases = cases;
+		for(c in cases) c.suite = this;
 	}
 	
 	public function setup() return Promise.NOISE;
