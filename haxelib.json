@@ -6,8 +6,8 @@
 	"contributors": [
 		"kevinresol"
 	],
-	"releasenote": "[breaking] Report excluded cases",
-	"version": "0.7.0",
+	"releasenote": "Store suite ref in a case",
+	"version": "0.7.1",
 	"url": "https://github.com/haxetink/tink_testrunner/",
 	"dependencies": {
 		"ansi": "",
