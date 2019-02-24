@@ -6,8 +6,8 @@
 	"contributors": [
 		"kevinresol"
 	],
-	"releasenote": "Store suite ref in a case",
-	"version": "0.7.1",
+	"releasenote": "Add suite position",
+	"version": "0.7.2",
 	"url": "https://github.com/haxetink/tink_testrunner/",
 	"dependencies": {
 		"ansi": "",
