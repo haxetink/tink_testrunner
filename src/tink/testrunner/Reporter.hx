@@ -89,7 +89,7 @@ class BasicReporter implements Reporter {
 				if(hasCasesToRun) {
 					println(' ');
 					var m = formatter.info(info.name) + ': ';
-					if(info.pos != null) m += formatter.extra('[${info.pos.fileName}:${info.pos.lineNumber}] ${info.pos.className}');
+					if(info.pos != null) m += formatter.extra('[${info.pos.fileName}:${info.pos.lineNumber}]');
 					println(m);
 				}
 				

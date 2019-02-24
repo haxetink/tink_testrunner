@@ -22,13 +22,13 @@ abstract Batch(Array<Suite>) from Array<Suite> to Array<Suite> {
 		
 		return switch type {
 			case TInst(_.get() => {name: 'Array', pack: []}, [param]) if(isType(param, 'Case')) : 
-				macro @:pos(type.getPosition()) tink.testrunner.Batch.ofCases($expr);
+				macro @:pos(expr.pos) tink.testrunner.Batch.ofCases($expr);
 			case TInst(_.get() => {name: 'Array', pack: []}, [param]) if(isType(param, 'Suite')) : 
-				macro @:pos(type.getPosition()) tink.testrunner.Batch.ofSuites($expr);
+				macro @:pos(expr.pos) tink.testrunner.Batch.ofSuites($expr);
 			case _ if(isType(type, 'Case')):
-				macro @:pos(type.getPosition()) tink.testrunner.Batch.ofCase($expr);
+				macro @:pos(expr.pos) tink.testrunner.Batch.ofCase($expr);
 			case _ if(isType(type, 'Suite')):
-				macro @:pos(type.getPosition()) tink.testrunner.Batch.ofSuite($expr);
+				macro @:pos(expr.pos) tink.testrunner.Batch.ofSuite($expr);
 			case _:
 				expr.pos.error('Cannot cast $type to tink.testrunner.Batch');
 		}

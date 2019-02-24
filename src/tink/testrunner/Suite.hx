@@ -22,11 +22,11 @@ abstract Suite(SuiteObject) from SuiteObject to SuiteObject {
 		
 		return switch type {
 			case TInst(_.get() => {name: 'Array', pack: []}, [param]) if(isType(param, 'Case')): 
-				macro @:pos(type.getPosition().sure()) tink.testrunner.Suite.ofCases($expr);
+				macro @:pos(expr.pos) tink.testrunner.Suite.ofCases($expr);
 			case _ if(isType(type, 'Case')):
-				macro @:pos(type.getPosition().sure()) tink.testrunner.Suite.ofCase($expr);
+				macro @:pos(expr.pos) tink.testrunner.Suite.ofCase($expr);
 			case _ if(isType(type, 'Suite.SuiteObject')):
-				macro @:pos(type.getPosition().sure()) $expr;
+				expr;
 			case _:
 				expr.pos.error('Cannot cast $type to tink.testrunner.Suite');
 		}
@@ -51,7 +51,7 @@ abstract Suite(SuiteObject) from SuiteObject to SuiteObject {
 
 typedef SuiteInfo = {
 	name:String,
-	pos:PosInfos,
+	?pos:PosInfos,
 }
 
 interface SuiteObject {
@@ -67,9 +67,10 @@ class BasicSuite implements SuiteObject {
 	public var info:SuiteInfo;
 	public var cases:Array<Case>;
 	
-	public function new(info, cases) {
+	public function new(info:SuiteInfo, cases, ?pos:haxe.PosInfos) {
 		this.info = info;
 		this.cases = cases;
+		if(info.pos == null) info.pos = pos;
 		for(c in cases) c.suite = this;
 	}
 	
