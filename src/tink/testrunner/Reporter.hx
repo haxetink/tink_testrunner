@@ -88,7 +88,9 @@ class BasicReporter implements Reporter {
 			case SuiteStart(info, hasCasesToRun):
 				if(hasCasesToRun) {
 					println(' ');
-					println(formatter.info(info.name));
+					var m = formatter.info(info.name) + ': ';
+					if(info.pos != null) m += formatter.extra('[${info.pos.fileName}:${info.pos.lineNumber}] ${info.pos.className}');
+					println(m);
 				}
 				
 			case CaseStart(info, shouldRun):

@@ -1,24 +1,48 @@
 package tink.testrunner;
 
 import tink.testrunner.Case;
+import haxe.PosInfos;
 
 using tink.CoreApi;
+
+#if macro 
+import haxe.macro.Context;
+using tink.MacroApi;
+#end
 
 @:forward
 abstract Suite(SuiteObject) from SuiteObject to SuiteObject {
 	
 	@:from
-	public static inline function ofCases<T:Case>(cases:Array<T>):Suite
+	public static macro function ofAny(expr:haxe.macro.Expr) {
+		var type = Context.typeof(expr);
+		
+		inline function isType(type, c:String)
+			return Context.unify(type, Context.getType('tink.testrunner.$c'));
+		
+		return switch type {
+			case TInst(_.get() => {name: 'Array', pack: []}, [param]) if(isType(param, 'Case')): 
+				macro @:pos(type.getPosition().sure()) tink.testrunner.Suite.ofCases($expr);
+			case _ if(isType(type, 'Case')):
+				macro @:pos(type.getPosition().sure()) tink.testrunner.Suite.ofCase($expr);
+			case _ if(isType(type, 'Suite.SuiteObject')):
+				macro @:pos(type.getPosition().sure()) $expr;
+			case _:
+				expr.pos.error('Cannot cast $type to tink.testrunner.Suite');
+		}
+	}
+	
+	public static inline function ofCases<T:Case>(cases:Array<T>, ?pos:PosInfos):Suite
 		return new BasicSuite({
 			name: [for(c in cases) switch Type.getClass(c) {
 				case null: null;
 				case c: Type.getClassName(c);
 			}].join(', '),
+			pos: pos,
 		}, cast cases);
 	
-	@:from
-	public static inline function ofCase(caze:Case):Suite
-		return ofCases([caze]);
+	public static inline function ofCase(caze:Case, ?pos:PosInfos):Suite
+		return ofCases([caze], pos);
 		
 	public function getCasesToBeRun(includeMode:Bool) {
 		return this.cases.filter(function(c) return c.shouldRun(includeMode));
@@ -27,6 +51,7 @@ abstract Suite(SuiteObject) from SuiteObject to SuiteObject {
 
 typedef SuiteInfo = {
 	name:String,
+	pos:PosInfos,
 }
 
 interface SuiteObject {
