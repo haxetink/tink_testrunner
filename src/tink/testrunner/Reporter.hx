@@ -76,6 +76,10 @@ class BasicReporter implements Reporter {
 						case 'Windows': new BasicFormatter();
 						default: new AnsiFormatter();
 					}
+				#elseif(ansi && js && travix) {
+					ANSI.stripIfUnavailable = false;
+					new AnsiFormatter();
+				}
 				#else
 					new BasicFormatter();
 				#end
