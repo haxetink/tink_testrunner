@@ -115,7 +115,7 @@ class BasicReporter implements Reporter {
 						formatter.error('[FAIL]');
 				}
 				var pos = formatter.extra('[${assertion.pos.fileName}:${assertion.pos.lineNumber}]');
-				var m = indent('- $holds $pos ${assertion.description}', 4);
+				var m = indent('- $holds $pos ${indent(assertion.description, 4, true)}', 4);
 				println(m);
 				if(failure != null) println(formatter.error(indent(failure, 8)));
 				
@@ -188,10 +188,12 @@ class BasicReporter implements Reporter {
 			throw "Not supported yet";
 		#end
 	
-	function indent(v:String, i = 0) {
-		return v.split('\n')
-			.map(function(line) return ''.lpad(' ', i) + line)
+	function indent(v:String, i = 0, skipFirst = false) {
+		var prefix = ''.lpad(' ', i);
+		var ret = v.split('\n')
+			.map(function(line) return prefix + line)
 			.join('\n');
+		return skipFirst ? ret.substr(i) : ret;
 	}
 	
 	function formatError(e:Error) {
