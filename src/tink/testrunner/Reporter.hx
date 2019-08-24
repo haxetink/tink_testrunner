@@ -61,6 +61,13 @@ class AnsiFormatter extends BasicFormatter {
 }
 #end
 
+#if console.hx
+class ConsoleHxFormatter extends BasicFormatter {
+	override function color(v:String, c:String):String
+		return '<$c>$v</$c>';
+}
+#end
+
 class BasicReporter implements Reporter {
 	
 	var noise = Future.sync(Noise);
@@ -71,7 +78,9 @@ class BasicReporter implements Reporter {
 			if(formatter != null)
 				formatter;
 			else
-				#if (ansi && (sys || nodejs))
+				#if console.hx
+					new ConsoleHxFormatter();
+				#elseif (ansi && (sys || nodejs))
 					switch Sys.systemName() {
 						case 'Windows': new BasicFormatter();
 						default: new AnsiFormatter();
@@ -176,7 +185,9 @@ class BasicReporter implements Reporter {
 	}
 	
 	function println(v:String)
-		#if travix
+		#if console.hx
+			Console.printlnFormatted(v);
+		#elseif travix
 			travix.Logger.println(v);
 		#elseif (flash || air || air3)
 			flash.Lib.trace(v);

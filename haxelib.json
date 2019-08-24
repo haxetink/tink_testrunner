@@ -10,7 +10,7 @@
 	"version": "0.7.2",
 	"url": "https://github.com/haxetink/tink_testrunner/",
 	"dependencies": {
-		"ansi": "",
+		"console.hx": "",
 		"tink_macro": "",
 		"tink_streams": ""
 	}
