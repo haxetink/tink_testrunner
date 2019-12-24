@@ -209,7 +209,7 @@ class CompactReporter extends BasicReporter {
 		case CaseStart(_):  
 			count = 0;
 			super.report(v);
-		case Assertion(assertion) if(assertion.holds):
+		case Assertion(assertion) if((assertion.holds:Bool /* Workaround https://github.com/HaxeFoundation/haxe/issues/9057 */)):
 			count++;
 			tink.core.Future.NOISE;
 		case CaseFinish(_):
