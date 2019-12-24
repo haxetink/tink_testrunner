@@ -205,17 +205,17 @@ class BasicReporter implements Reporter {
 class CompactReporter extends BasicReporter {
 	var count = 0;
 	override function report(v:ReportType) {
-	return switch v {
-		case CaseStart(_):  
-			count = 0;
-			super.report(v);
-		case Assertion(assertion) if((assertion.holds:Bool /* Workaround https://github.com/HaxeFoundation/haxe/issues/9057 */)):
-			count++;
-			tink.core.Future.NOISE;
-		case CaseFinish(_):
-			println(formatter.success(indent('+ $count assertion(s) succeeded', 4)));
-			super.report(v);
-		case _: super.report(v);
+		return switch v {
+			case CaseStart(_):  
+				count = 0;
+				super.report(v);
+			case Assertion(assertion) if((assertion.holds:Bool /* Workaround https://github.com/HaxeFoundation/haxe/issues/9057 */)):
+				count++;
+				tink.core.Future.NOISE;
+			case CaseFinish(_):
+				println(formatter.success(indent('+ $count assertion(s) succeeded', 4)));
+				super.report(v);
+			case _: super.report(v);
+		}
 	}
-}
 }
