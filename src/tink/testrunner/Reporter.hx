@@ -2,7 +2,7 @@ package tink.testrunner;
 
 import tink.testrunner.Suite;
 import tink.testrunner.Case;
-import tink.testrunner.Runner;
+import tink.testrunner.Result;
 
 using tink.CoreApi;
 using Lambda;
@@ -129,7 +129,7 @@ class BasicReporter implements Reporter {
 			case SuiteFinish(result):
 			
 				switch result.result {
-					case Success(_): // ok
+					case Succeeded(_): // ok
 					case SetupFailed(e): println(formatter.error(indent('Setup Failed: ${formatError(e)}', 2)));
 					case TeardownFailed(e, _): println(formatter.error(indent('Teardown Failed: ${formatError(e)}', 2)));
 				}

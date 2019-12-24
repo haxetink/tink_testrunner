@@ -4,6 +4,7 @@ import tink.streams.Stream;
 import tink.testrunner.Case;
 import tink.testrunner.Suite;
 import tink.testrunner.Reporter;
+import tink.testrunner.Result;
 import tink.testrunner.Timer;
 import haxe.PosInfos;
 
@@ -83,7 +84,7 @@ class Runner {
 						teardown().handle(function(o) cb({
 							info: suite.info,
 							result: switch o {
-								case Success(_): Success(results);
+								case Success(_): Succeeded(results);
 								case Failure(e): TeardownFailed(e, results);
 							}
 						}));
@@ -117,7 +118,7 @@ class Runner {
 						})
 						.next(function(result) return suite.after().timeout(caze.timeout, timers, caze.pos).next(function(_) return result))
 						.handle(function(result) {
-							var results = {
+							var results:CaseResult = {
 								info: caze.info,
 								result: switch result {
 									case Success(v): Succeeded(v);
@@ -130,7 +131,7 @@ class Runner {
 			} else {
 				reporter.report(CaseStart(caze.info, shouldRun))
 					.handle(function(_) {
-						var results = {
+						var results:CaseResult = {
 							info: caze.info,
 							result: Excluded,
 						}
@@ -162,66 +163,5 @@ class TimeoutHelper {
 	}
 }
 
-@:forward
-abstract BatchResult(Array<SuiteResult>) from Array<SuiteResult> to Array<SuiteResult> {
-	public function summary() {
-		var ret = {
-			assertions: [],
-			failures: [],
-		};
-		
-		function handleCases(cases:Array<CaseResult>)
-			for(c in cases) switch c.result {
-				case Succeeded(assertions):
-					ret.assertions = ret.assertions.concat(assertions);
-					ret.failures = ret.failures.concat(
-						assertions.filter(function(a) return !a.holds)
-							.map(function(a) return AssertionFailed(a))
-					);
-				case Failed(e):
-					ret.failures.push(CaseFailed(e));
-				case Excluded:
-					// do nothing
-			}
-		
-		for(s in this) switch s.result {
-			case Success(cases):
-				handleCases(cases);
-			case SetupFailed(e):
-				ret.failures.push(SuiteFailed(e));
-			case TeardownFailed(e, cases): 
-			 	handleCases(cases);
-				ret.failures.push(SuiteFailed(e));
-		}
-		
-		return ret;
-	}
-}
 
-typedef SuiteResult = {
-	info:SuiteInfo,
-	result:SuiteResultType,
-}
 
-typedef CaseResult = {
-	info:CaseInfo,
-	result:CaseResultType,
-}
-
-enum SuiteResultType {
-	Success(cases:Array<CaseResult>);
-	SetupFailed(e:Error);
-	TeardownFailed(e:Error, cases:Array<CaseResult>);
-}
-
-enum CaseResultType {
-	Succeeded(assertions:Array<Assertion>);
-	Failed(e:Error);
-	Excluded;
-}
-
-enum FailureType {
-	AssertionFailed(assertion:Assertion);
-	CaseFailed(err:Error);
-	SuiteFailed(err:Error);
-}
