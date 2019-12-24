@@ -62,7 +62,6 @@ class AnsiFormatter extends BasicFormatter {
 #end
 
 class BasicReporter implements Reporter {
-	
 	var noise = Future.sync(Noise);
 	var formatter:Formatter;
 	
@@ -201,4 +200,22 @@ class BasicReporter implements Reporter {
 		if(e.data != null) str += '\n' + Std.string(e.data);
 		return str;
 	}
+}
+
+class CompactReporter extends BasicReporter {
+	var count = 0;
+	override function report(v:ReportType) {
+	return switch v {
+		case CaseStart(_):  
+			count = 0;
+			super.report(v);
+		case Assertion(assertion) if(assertion.holds):
+			count++;
+			tink.core.Future.NOISE;
+		case CaseFinish(_):
+			println(formatter.success(indent('+ $count assertion(s) succeeded', 4)));
+			super.report(v);
+		case _: super.report(v);
+	}
+}
 }
