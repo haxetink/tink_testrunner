@@ -62,7 +62,6 @@ class AnsiFormatter extends BasicFormatter {
 #end
 
 class BasicReporter implements Reporter {
-	var noise = Future.sync(Noise);
 	var formatter:Formatter;
 	
 	public function new(?formatter) {
@@ -87,93 +86,122 @@ class BasicReporter implements Reporter {
 	public function report(type:ReportType):Future<Noise> {
 		switch type {
 			case BatchStart:
-				
+				reportBatchStart();
 			case SuiteStart(info, hasCasesToRun):
-				if(hasCasesToRun) {
-					println(' ');
-					var m = formatter.info(info.name) + ': ';
-					if(info.pos != null) m += formatter.extra('[${info.pos.fileName}:${info.pos.lineNumber}]');
-					println(m);
-				}
-				
+				reportSuiteStart(info, hasCasesToRun);
 			case CaseStart(info, shouldRun):
-				if(shouldRun) {
-					var m = formatter.info(indent(info.name, 2)) + ': ';
-					if(info.pos != null) m += formatter.extra('[${info.pos.fileName}:${info.pos.lineNumber}] ');
-					if(info.description != null) m += formatter.mute(info.description);
-					println(m);
-				}
-				
+				reportCaseStart(info, shouldRun);
 			case Assertion(assertion):
-			
-				var failure = null;
-				var holds = switch assertion.holds {
-					case Success(_): formatter.success('[OK]');
-					case Failure(msg):
-						failure = msg;
-						formatter.error('[FAIL]');
-				}
-				var pos = formatter.extra('[${assertion.pos.fileName}:${assertion.pos.lineNumber}]');
-				var m = indent('- $holds $pos ${indent(assertion.description, 4, true)}', 4);
-				println(m);
-				if(failure != null) println(formatter.error(indent(failure, 8)));
-				
-			case CaseFinish({result: result}):
-				switch result {
-					case Failed(e):
-						println(formatter.error(indent('- ${formatError(e)}', 4)));
-					case _:
-			}
-				
+				reportAssertion(assertion);
+			case CaseFinish(result):
+				reportCaseFinish(result);
 			case SuiteFinish(result):
-			
-				switch result.result {
-					case Succeeded(_): // ok
-					case SetupFailed(e): println(formatter.error(indent('Setup Failed: ${formatError(e)}', 2)));
-					case TeardownFailed(e, _): println(formatter.error(indent('Teardown Failed: ${formatError(e)}', 2)));
-				}
-				
+				reportSuiteFinish(result);
 			case BatchFinish(result):
-				
-				var summary = result.summary();
-				var total = summary.assertions.length;
-				var failures = 0, errors = 0;
-				for(f in summary.failures) switch f {
-					case AssertionFailed(_): failures++;
-					default: errors++;
-				}
-				var success = total - failures;
-				
-				var m = new StringBuf();
-				m.add(total);
-				m.add(' Assertion');
-				if(total > 1) m.add('s');
-				m.add('   ');
-				
-				m.add(success);
-				m.add(' Success');
-				m.add('   ');
-				
-				m.add(failures);
-				m.add(' Failure');
-				if(failures > 1) m.add('s');
-				m.add('   ');
-				
-				m.add(errors);
-				m.add(' Error');
-				if(errors > 1) m.add('s');
-				m.add('   ');
-				
-				var m = m.toString();
-				
-				println(' ');
-				println(failures == 0 && errors == 0 ? formatter.success(m) : formatter.error(m));
-				println(' ');
-				
+				reportBatchFinish(result);
 		}
-		return noise;
+		return Future.NOISE;
 	}
-	
+
+	function reportBatchStart() {}
+
+	function reportSuiteStart(info:SuiteInfo, hasCasesToRun:Bool) {
+		if (hasCasesToRun) {
+			println(' ');
+			var m = formatter.info(info.name) + ': ';
+			if (info.pos != null)
+				m += formatter.extra('[${info.pos.fileName}:${info.pos.lineNumber}]');
+			println(m);
+		}
+	}
+
+	function reportCaseStart(info:CaseInfo, shouldRun:Bool) {
+		if (shouldRun) {
+			var m = formatter.info(indent(info.name, 2)) + ': ';
+			if (info.pos != null)
+				m += formatter.extra('[${info.pos.fileName}:${info.pos.lineNumber}] ');
+			if (info.description != null)
+				m += formatter.mute(info.description);
+			println(m);
+		}
+	}
+
+	function reportAssertion(assertion:Assertion) {
+		var failure = null;
+		var holds = switch assertion.holds {
+			case Success(_): formatter.success('[OK]');
+			case Failure(msg):
+				failure = msg;
+				formatter.error('[FAIL]');
+		}
+		var pos = formatter.extra('[${assertion.pos.fileName}:${assertion.pos.lineNumber}]');
+		var m = indent('- $holds $pos ${indent(assertion.description, 4, true)}', 4);
+		println(m);
+		if (failure != null)
+			println(formatter.error(indent(failure, 8)));
+	}
+
+	function reportCaseFinish(result:CaseResult) {
+		switch result.result {
+			case Failed(e):
+				println(formatter.error(indent('- ${formatError(e)}', 4)));
+			case _:
+		}
+	}
+
+	function reportSuiteFinish(result:SuiteResult) {
+		switch result.result {
+			case Succeeded(_): // ok
+			case SetupFailed(e):
+				println(formatter.error(indent('Setup Failed: ${formatError(e)}', 2)));
+			case TeardownFailed(e, _):
+				println(formatter.error(indent('Teardown Failed: ${formatError(e)}', 2)));
+		}
+	}
+
+	function reportBatchFinish(result:BatchResult) {
+		var summary = result.summary();
+		var total = summary.assertions.length;
+		var failures = 0, errors = 0;
+		for (f in summary.failures)
+			switch f {
+				case AssertionFailed(_):
+					failures++;
+				default:
+					errors++;
+			}
+		var success = total - failures;
+
+		var m = new StringBuf();
+		m.add(total);
+		m.add(' Assertion');
+		if (total > 1)
+			m.add('s');
+		m.add('   ');
+
+		m.add(success);
+		m.add(' Success');
+		m.add('   ');
+
+		m.add(failures);
+		m.add(' Failure');
+		if (failures > 1)
+			m.add('s');
+		m.add('   ');
+
+		m.add(errors);
+		m.add(' Error');
+		if (errors > 1)
+			m.add('s');
+		m.add('   ');
+
+		var m = m.toString();
+
+		println(' ');
+		println(failures == 0 && errors == 0 ? formatter.success(m) : formatter.error(m));
+		println(' ');
+	}
+
 	function println(v:String)
 		#if travix
 			travix.Logger.println(v);
@@ -204,18 +232,23 @@ class BasicReporter implements Reporter {
 
 class CompactReporter extends BasicReporter {
 	var count = 0;
-	override function report(v:ReportType) {
-		return switch v {
-			case CaseStart(_):  
-				count = 0;
-				super.report(v);
-			case Assertion(assertion) if((assertion.holds:Bool /* Workaround https://github.com/HaxeFoundation/haxe/issues/9057 */)):
-				count++;
-				tink.core.Future.NOISE;
-			case CaseFinish(_):
-				println(formatter.success(indent('+ $count assertion(s) succeeded', 4)));
-				super.report(v);
-			case _: super.report(v);
+
+	override function reportCaseStart(info, shouldRun) {
+		count = 0;
+		super.reportCaseStart(info, shouldRun);
+	}
+
+	override function reportAssertion(assertion:Assertion) {
+		if (assertion.holds) {
+			count++;
+		} else {
+			super.reportAssertion(assertion);
 		}
 	}
+
+	override function reportCaseFinish(result) {
+		println(formatter.success(indent('+ $count assertion(s) succeeded', 4)));
+		super.reportCaseFinish(result);
+	}
 }
+
