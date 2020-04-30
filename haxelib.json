@@ -6,8 +6,8 @@
 	"contributors": [
 		"kevinresol"
 	],
-	"releasenote": "Add suite position",
-	"version": "0.7.2",
+	"releasenote": "Add CompactReporter",
+	"version": "0.8.0",
 	"url": "https://github.com/haxetink/tink_testrunner/",
 	"dependencies": {
 		"ansi": "",
