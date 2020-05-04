@@ -68,11 +68,18 @@ class BasicReporter implements Reporter {
 		this.formatter =
 			if(formatter != null)
 				formatter;
-			else
+			else {
 				#if (ansi && (sys || nodejs))
-					switch Sys.systemName() {
-						case 'Windows': new BasicFormatter();
-						default: new AnsiFormatter();
+					if(Sys.systemName() == 'Windows') { 
+						// HACK: use the "ANSICON" env var to force enable ANSI if running in PowerShell
+						var isPowerShell = Sys.getEnv('PSModulePath').split(';').length >= 3;
+						if(isPowerShell) Sys.putEnv('ANSICON', '1');
+					}
+
+					if(ANSI.available) {
+						new AnsiFormatter();
+					} else {
+						new BasicFormatter();
 					}
 				#elseif(ansi && js && travix) {
 					ANSI.stripIfUnavailable = false;
@@ -81,6 +88,7 @@ class BasicReporter implements Reporter {
 				#else
 					new BasicFormatter();
 				#end
+			}
 	}
 	
 	public function report(type:ReportType):Future<Noise> {
