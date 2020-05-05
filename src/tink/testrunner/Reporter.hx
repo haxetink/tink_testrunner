@@ -71,6 +71,7 @@ class BasicReporter implements Reporter {
 			else {
 				#if (ansi && (sys || nodejs))
 					if(ANSI.available) {
+						ANSI.stripIfUnavailable = false;
 						new AnsiFormatter();
 					} else {
 						new BasicFormatter();
