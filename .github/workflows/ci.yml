@@ -24,12 +24,12 @@ jobs:
         target: 
           - interp
           - node
-          - neko
-          - python
-          - php
-          - cpp
-          - js
-          - java -D jvm
+          # - neko
+          # - python
+          # - php
+          # - cpp
+          # - js
+          # - java -D jvm
         exclude:
           # jvm only works on haxe 4
           - haxe-version: 3.4.7
