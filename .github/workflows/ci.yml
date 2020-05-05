@@ -54,7 +54,7 @@ jobs:
       uses: actions/cache@v1
       with:
         path: ~/haxe
-        key: haxe
+        key: ${{ runner.os }}-haxe-${{ hashFiles('haxe_libaries/**') }}
       
     - uses: lix-pm/setup-lix@master
     - run: lix install haxe ${{ matrix.haxe-version }}
