@@ -70,12 +70,6 @@ class BasicReporter implements Reporter {
 				formatter;
 			else {
 				#if (ansi && (sys || nodejs))
-					if(Sys.systemName() == 'Windows') { 
-						// HACK: use the "ANSICON" env var to force enable ANSI if running in PowerShell
-						var isPowerShell = Sys.getEnv('PSModulePath').split(';').length >= 3;
-						if(isPowerShell) Sys.putEnv('ANSICON', '1');
-					}
-
 					if(ANSI.available) {
 						new AnsiFormatter();
 					} else {
@@ -89,6 +83,14 @@ class BasicReporter implements Reporter {
 					new BasicFormatter();
 				#end
 			}
+	}
+
+	static function __init__() {
+		if(Sys.systemName() == 'Windows') { 
+			// HACK: use the "ANSICON" env var to force enable ANSI if running in PowerShell
+			var isPowerShell = Sys.getEnv('PSModulePath').split(';').length >= 3;
+			if(isPowerShell) Sys.putEnv('ANSICON', '1');
+		}
 	}
 	
 	public function report(type:ReportType):Future<Noise> {
