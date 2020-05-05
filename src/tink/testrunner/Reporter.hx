@@ -85,6 +85,7 @@ class BasicReporter implements Reporter {
 			}
 	}
 
+	#if (ansi && (sys || nodejs))
 	static function __init__() {
 		if(Sys.systemName() == 'Windows') { 
 			// HACK: use the "ANSICON" env var to force enable ANSI if running in PowerShell
@@ -92,6 +93,7 @@ class BasicReporter implements Reporter {
 			if(isPowerShell) Sys.putEnv('ANSICON', '1');
 		}
 	}
+	#end
 	
 	public function report(type:ReportType):Future<Noise> {
 		switch type {
