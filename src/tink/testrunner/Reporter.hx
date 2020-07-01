@@ -90,7 +90,8 @@ class BasicReporter implements Reporter {
 	static function __init__() {
 		if(Sys.systemName() == 'Windows') { 
 			// HACK: use the "ANSICON" env var to force enable ANSI if running in PowerShell
-			var isPowerShell = Sys.getEnv('PSModulePath').split(';').length >= 3;
+			var value = Sys.getEnv('PSModulePath');
+			var isPowerShell = value != null && value.split(';').length >= 3;
 			if(isPowerShell) Sys.putEnv('ANSICON', '1');
 		}
 	}
