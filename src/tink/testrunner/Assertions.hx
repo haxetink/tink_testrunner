@@ -7,7 +7,7 @@ using tink.CoreApi;
 
 private typedef Impl = Stream<Assertion #if pure , Error #end>;
 
-@:forward
+@:forward @:transitive
 abstract Assertions(Impl) from Impl to Impl {
 	@:from
 	public static inline function ofAssertion(o:Assertion):Assertions {
