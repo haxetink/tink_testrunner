@@ -62,14 +62,18 @@ class AnsiFormatter extends BasicFormatter {
 #end
 
 class BasicReporter implements Reporter {
+	#if (ansi && (sys || nodejs))
 	static var inited = false;
+	#end
 	var formatter:Formatter;
 	
 	public function new(?formatter) {
+		#if (ansi && (sys || nodejs))
 		if(!inited) {
 			inited = true;
 			init();
 		}
+		#end
 		this.formatter =
 			if(formatter != null)
 				formatter;
