@@ -62,9 +62,14 @@ class AnsiFormatter extends BasicFormatter {
 #end
 
 class BasicReporter implements Reporter {
+	static var inited = false;
 	var formatter:Formatter;
 	
 	public function new(?formatter) {
+		if(!inited) {
+			inited = true;
+			init();
+		}
 		this.formatter =
 			if(formatter != null)
 				formatter;
@@ -87,7 +92,7 @@ class BasicReporter implements Reporter {
 	}
 
 	#if (ansi && (sys || nodejs))
-	static function __init__() {
+	static function init() {
 		if(Sys.systemName() == 'Windows') { 
 			// HACK: use the "ANSICON" env var to force enable ANSI if running in PowerShell
 			var value = Sys.getEnv('PSModulePath');
