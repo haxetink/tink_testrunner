@@ -73,4 +73,16 @@ abstract Assertions(Impl) from Impl to Impl {
 		return Stream.later((p:Surprise<Impl, Error>));
 		#end
 	}
+	
+	#if tink_unittest
+	// TODO: use solution from https://github.com/HaxeFoundation/haxe/issues/9611
+	@:from
+	public static inline function ofFutureAssertionBuffer(p:Future<tink.unit.AssertionBuffer>):Assertions {
+		return ofFutureAssertions(cast p);
+	}
+	@:from
+	public static inline function ofPromiseAssertionBuffer(p:Promise<tink.unit.AssertionBuffer>):Assertions {
+		return ofPromiseAssertions(cast p);
+	}
+	#end
 }
