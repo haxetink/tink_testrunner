@@ -23,7 +23,7 @@ abstract BatchResult(Array<SuiteResult>) from Array<SuiteResult> to Array<SuiteR
 							.map(function(a) return AssertionFailed(a))
 					);
 				case Failed(e):
-					ret.failures.push(CaseFailed(e));
+					ret.failures.push(CaseFailed(e, c.info));
 				case Excluded:
 					// do nothing
 			}
@@ -32,10 +32,10 @@ abstract BatchResult(Array<SuiteResult>) from Array<SuiteResult> to Array<SuiteR
 			case Succeeded(cases):
 				handleCases(cases);
 			case SetupFailed(e):
-				ret.failures.push(SuiteFailed(e));
+				ret.failures.push(SuiteFailed(e, s.info));
 			case TeardownFailed(e, cases): 
 			 	handleCases(cases);
-				ret.failures.push(SuiteFailed(e));
+				ret.failures.push(SuiteFailed(e, s.info));
 		}
 		
 		return ret;
@@ -66,6 +66,6 @@ enum CaseResultType {
 
 enum FailureType {
 	AssertionFailed(assertion:Assertion);
-	CaseFailed(err:Error);
-	SuiteFailed(err:Error);
+	CaseFailed(err:Error, info:CaseInfo);
+	SuiteFailed(err:Error, info:SuiteInfo);
 }
