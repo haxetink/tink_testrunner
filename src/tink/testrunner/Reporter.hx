@@ -101,7 +101,9 @@ class BasicReporter implements Reporter {
 			// HACK: use the "ANSICON" env var to force enable ANSI if running in PowerShell
 			var value = Sys.getEnv('PSModulePath');
 			var isPowerShell = value != null && value.split(';').length >= 3;
+			#if !java // Java cannot do this ... perhaps it's possible via Sys.command, but since this is a hack anyway, I'll forgo the pleasure of messing with this
 			if(isPowerShell) Sys.putEnv('ANSICON', '1');
+			#end
 		}
 	}
 	#end
