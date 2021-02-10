@@ -99,9 +99,10 @@ class Runner {
 					suite.before().timeout(caze.timeout, timers, caze.pos)
 						.next(function(_) {
 							var assertions = [];
-							return caze.execute().forEach(function(a, _) {
+							return
+								caze.execute().forEach(a -> {
 									assertions.push(a);
-									return reporter.report(Assertion(a)).map(function(_) return null);
+									reporter.report(Assertion(a)).map(_ -> None);
 								})
 								.next(function(o):Outcome<Array<Assertion>, Error> return switch o {
 									case Done: Success(assertions);
