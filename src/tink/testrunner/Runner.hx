@@ -12,20 +12,20 @@ using tink.testrunner.Runner.TimeoutHelper;
 using tink.CoreApi;
 
 class Runner {
-	
+
 	public static function exit(result:BatchResult) {
 		Helper.exit(result.summary().failures.length);
 	}
-	
+
 	public static function run(batch:Batch, ?reporter:Reporter, ?timers:TimerManager):Future<BatchResult> {
-		
+
 		if(reporter == null) reporter = new BasicReporter();
 		if(timers == null) {
 			#if ((haxe_ver >= 3.3) || flash || js || openfl)
 				timers = new HaxeTimerManager();
 			#end
 		}
-			
+
 		var includeMode = false;
 		for(s in batch.suites) {
 			if(includeMode) break;
@@ -34,7 +34,7 @@ class Runner {
 				break;
 			}
 		}
-		
+
 		return Future.async(function(cb) {
 			reporter.report(BatchStart).handle(function(_) {
 				var iter = batch.suites.iterator();
@@ -54,17 +54,17 @@ class Runner {
 			});
 		});
 	}
-	
-	
+
+
 	static function runSuite(suite:Suite, reporter:Reporter, timers:TimerManager, includeMode:Bool):Future<SuiteResult> {
 		return Future.async(function(cb) {
 			var cases = suite.getCasesToBeRun(includeMode);
 			var hasCases = cases.length > 0;
 			reporter.report(SuiteStart(suite.info, hasCases)).handle(function(_) {
-				
+
 				function setup() return hasCases ? suite.setup() : Promise.NOISE;
 				function teardown() return hasCases ? suite.teardown() : Promise.NOISE;
-				
+
 				var iter = suite.cases.iterator();
 				var results = [];
 				function next() {
@@ -91,7 +91,7 @@ class Runner {
 			});
 		});
 	}
-	
+
 	static function runCase(caze:Case, suite:Suite, reporter:Reporter, timers:TimerManager, shouldRun:Bool):Future<CaseResult> {
 		return Future.async(function(cb) {
 			if(shouldRun) {
@@ -99,14 +99,14 @@ class Runner {
 					suite.before().timeout(caze.timeout, timers, caze.pos)
 						.next(function(_) {
 							var assertions = [];
-							return caze.execute().forEach(function(a) {
+							return caze.execute().forEach(function(a, _) {
 									assertions.push(a);
-									return reporter.report(Assertion(a)).map(function(_) return Resume);
+									return reporter.report(Assertion(a)).map(function(_) return null);
 								})
 								.next(function(o):Outcome<Array<Assertion>, Error> return switch o {
-									case Depleted: Success(assertions);
-									case Halted(_): throw 'unreachable';
-									case Failed(e): Failure(e);
+									case Done: Success(assertions);
+									case Stopped(rest, Failure(e)): Failure(e);
+									default: throw 'unreachable';
 								})
 								.timeout(caze.timeout, timers);
 						})
@@ -134,7 +134,7 @@ class Runner {
 			}
 		});
 	}
-	
+
 }
 
 class TimeoutHelper {
