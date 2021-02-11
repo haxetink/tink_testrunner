@@ -106,7 +106,7 @@ class Runner {
 								})
 								.next(function(o):Outcome<Array<Assertion>, Error> return switch o {
 									case Done: Success(assertions);
-									case Stopped(rest, Failure(e)): Failure(e);
+									case Failed(_, e): Failure(e);
 									default: throw 'unreachable';
 								})
 								.timeout(caze.timeout, timers);
