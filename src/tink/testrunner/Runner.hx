@@ -35,7 +35,7 @@ class Runner {
 			}
 		}
 
-		return Future.async(function(cb) {
+		return Future.irreversible(function(cb) {
 			reporter.report(BatchStart).handle(function(_) {
 				var iter = batch.suites.iterator();
 				var results:BatchResult = [];
@@ -57,7 +57,7 @@ class Runner {
 
 
 	static function runSuite(suite:Suite, reporter:Reporter, timers:TimerManager, includeMode:Bool):Future<SuiteResult> {
-		return Future.async(function(cb) {
+		return Future.irreversible(function(cb) {
 			var cases = suite.getCasesToBeRun(includeMode);
 			var hasCases = cases.length > 0;
 			reporter.report(SuiteStart(suite.info, hasCases)).handle(function(_) {
@@ -93,7 +93,7 @@ class Runner {
 	}
 
 	static function runCase(caze:Case, suite:Suite, reporter:Reporter, timers:TimerManager, shouldRun:Bool):Future<CaseResult> {
-		return Future.async(function(cb) {
+		return Future.irreversible(function(cb) {
 			if(shouldRun) {
 				reporter.report(CaseStart(caze.info, shouldRun)).handle(function(_) {
 					suite.before().timeout(caze.timeout, timers, caze.pos)
@@ -140,7 +140,7 @@ class Runner {
 
 class TimeoutHelper {
 	public static function timeout<T>(promise:Promise<T>, ms:Int, timers:TimerManager, ?pos:PosInfos):Promise<T> {
-		return Future.async(function(cb) {
+		return Future.irreversible(function(cb) {
 			var done = false;
 			var timer = null;
 			var link = promise.handle(function(o) {
