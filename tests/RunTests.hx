@@ -77,6 +77,20 @@ class RunTests {
 			})
 		);
 		
+		// Test: after/teardown should be run even if case errored
+		var suite = new ActionSuite({name: 'ErrorSuite'}, [
+			new ErrorCase(),
+		]);
+		futures.push(
+			function() return Runner.run([
+				suite,
+			]).map(function(result) {
+				assertEquals(suite.actions.join(','), 'setup,before,after,teardown');
+				assertEquals(1, result.summary().failures.length);
+				return Noise;
+			})
+		);
+		
 		var iter = futures.iterator();
 		function next() {
 			if(iter.hasNext()) iter.next()().handle(next);
@@ -131,6 +145,32 @@ class ExcludedCase extends BasicCase {
 	}
 	override function execute():Assertions {
 		return new Assertion(true, 'Dummy');
+	}
+}
+class ErrorCase extends BasicCase {
+	override function execute():Assertions {
+		return Failure(new Error('Errored'));
+	}
+}
+
+class ActionSuite extends BasicSuite {
+	public var actions:Array<String> = [];
+	
+	override function setup() {
+		actions.push('setup');
+		return Promise.NOISE;
+	}
+	override function before() {
+		actions.push('before');
+		return Promise.NOISE;
+	}
+	override function after() {
+		actions.push('after');
+		return Promise.NOISE;
+	}
+	override function teardown() {
+		actions.push('teardown');
+		return Promise.NOISE;
 	}
 }
 

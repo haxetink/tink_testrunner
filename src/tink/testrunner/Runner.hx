@@ -110,7 +110,7 @@ class Runner {
 								})
 								.timeout(caze.timeout, timers);
 						})
-						.next(function(result) return suite.after().timeout(caze.timeout, timers, caze.pos).next(function(_) return result))
+						.flatMap(function(outcome) return suite.after().timeout(caze.timeout, timers, caze.pos).next(function(_) return outcome))
 						.handle(function(result) {
 							var results:CaseResult = {
 								info: caze.info,
