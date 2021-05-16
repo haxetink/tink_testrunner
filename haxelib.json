@@ -6,8 +6,8 @@
 	"contributors": [
 		"kevinresol"
 	],
-	"releasenote": "Add CompactReporter",
-	"version": "0.8.0",
+	"releasenote": "Various bug fixes and drop haxe3 support",
+	"version": "0.9.0",
 	"url": "https://github.com/haxetink/tink_testrunner/",
 	"dependencies": {
 		"ansi": "",
