@@ -62,5 +62,5 @@ jobs:
     - uses: lix-pm/setup-lix@master
     - run: lix install haxe ${{ matrix.haxe-version }}
     - run: lix download
-    - run: lix install 'tink_core#${{ matrix.tink_core }}'
+    - run: lix +tink 'core#${{ matrix.tink_core }}'
     - run: lix run travix ${{ matrix.target }}
