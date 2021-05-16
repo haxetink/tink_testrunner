@@ -13,7 +13,7 @@ jobs:
       matrix:
         os: 
           - ubuntu-latest
-          - windows-latest
+          # - windows-latest
           - macos-latest
         haxe-version:
           - 4.0.5
