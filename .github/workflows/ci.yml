@@ -21,6 +21,9 @@ jobs:
           - 3.4.7
           - stable
           - nightly
+        tink_core:
+          - v1
+          - master
         target: 
           - interp
           - node
@@ -59,4 +62,5 @@ jobs:
     - uses: lix-pm/setup-lix@master
     - run: lix install haxe ${{ matrix.haxe-version }}
     - run: lix download
+    - run: lix install 'tink_core#${{ matrix.tink_core }}'
     - run: lix run travix ${{ matrix.target }}
