@@ -32,6 +32,9 @@ jobs:
           - cpp
           - js
           - java -D jvm
+        exclude:
+          - haxe-version: 4.0.5
+            target: java -D jvm
 
     steps:
     - name: Check out repo
