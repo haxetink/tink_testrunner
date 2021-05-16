@@ -13,7 +13,7 @@ jobs:
       matrix:
         os: 
           - ubuntu-latest
-          # - windows-latest FIXME: Type not found : travix.PostDownload
+          - windows-latest
           - macos-latest
         haxe-version:
           - 4.0.5
@@ -55,7 +55,7 @@ jobs:
     - name: Cache Haxe
       uses: actions/cache@v1
       with:
-        path: ~/haxe
+        path: ${{ startsWith(runner.os, 'windows') && '%AppData%' || '~/haxe' }}
         key: ${{ runner.os }}-haxe
         
     - name: Install Lix
