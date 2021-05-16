@@ -18,7 +18,9 @@ jobs:
           # - windows-latest FIXME: Type not found : travix.PostDownload
           - macos-latest
         haxe-version:
-          - 3.4.7
+          # - 3.4.7
+          - 4.0.5
+          - 4.1.5
           - stable
           - nightly
         tink_core:
