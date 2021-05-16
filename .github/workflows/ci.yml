@@ -67,6 +67,8 @@ jobs:
     - name: Install Haxe Libraries
       run: lix download
       
+    - run: lix +tink 'core#${{ matrix.tink_core }}'
+      
     - name: Run Test
       run: lix run travix ${{ matrix.target }}
 
@@ -105,8 +107,6 @@ jobs:
     
     - name: Install Haxe Libraries
       run: lix download
-      
-    - run: lix +tink 'core#${{ matrix.tink_core }}'
       
     - name: Release to Haxelib
       run: lix run travix release
