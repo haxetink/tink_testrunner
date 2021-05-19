@@ -1,6 +1,7 @@
--D tink_testrunner=0.7.1
-# @install: lix --silent download "gh://github.com/haxetink/tink_testrunner#2622b5c00dba713902f76a49f1f1caffccb47d51" into tink_testrunner/0.7.1/github/2622b5c00dba713902f76a49f1f1caffccb47d51
+-D tink_testrunner=0.9.0
 -lib ansi
 -lib tink_macro
 -lib tink_streams
 -cp src
+
+extraParams.hxml
