@@ -101,12 +101,12 @@ class Runner {
 							var assertions = [];
 							return caze.execute().forEach(function(a) {
 									assertions.push(a);
-									return reporter.report(Assertion(a)).map(function(_) return Resume);
+									return reporter.report(Assertion(a)).swap(None);
 								})
 								.next(function(o):Outcome<Array<Assertion>, Error> return switch o {
-									case Depleted: Success(assertions);
-									case Halted(_): throw 'unreachable';
-									case Failed(e): Failure(e);
+									case Done: Success(assertions);
+									case Stopped(_): throw 'unreachable';
+									case Failed(_, e): Failure(e);
 								})
 								.timeout(caze.timeout, timers);
 						})

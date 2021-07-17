@@ -38,10 +38,12 @@ abstract Assertions(Impl) from Impl to Impl {
 	
 	@:from
 	public static function ofSurpriseAssertion(p:Surprise<Assertion, Error>):Assertions {
-		return Stream.future(p.map(function(o):Stream<Dynamic, Dynamic> return switch o {
-			case Success(a): Stream.single(a);
-			case Failure(e): Stream.ofError(e);
-		}));
+		return ofPromiseAssertion(p);
+	}
+	
+	@:from
+	public static inline function ofPromiseAssertion(p:Promise<Assertion>):Assertions {
+		return Stream.promise(p.next(assertion -> Stream.single(assertion)));
 	}
 	
 	@:from
@@ -51,7 +53,7 @@ abstract Assertions(Impl) from Impl to Impl {
 	
 	@:from
 	public static inline function ofPromiseAssertions(p:Promise<Assertions>):Assertions {
-		return ofSurpriseAssertions(p);
+		return Stream.promise(p);
 	}
 	
 	@:from
