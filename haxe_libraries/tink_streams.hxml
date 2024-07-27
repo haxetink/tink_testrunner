@@ -1,4 +1,4 @@
-# @install: lix --silent download "gh://github.com/haxetink/tink_streams#f4478825ef0a30df1187f02a354ec61176b47b8b" into tink_streams/0.3.3/github/f4478825ef0a30df1187f02a354ec61176b47b8b
+# @install: lix --silent download "gh://github.com/haxetink/tink_streams#aa8a05f7a82e5b881ae3bf8df4aa219bd56fec0f" into tink_streams/0.3.3/github/aa8a05f7a82e5b881ae3bf8df4aa219bd56fec0f
 -lib tink_core
--cp ${HAXE_LIBCACHE}/tink_streams/0.3.3/github/f4478825ef0a30df1187f02a354ec61176b47b8b/src
+-cp ${HAXE_LIBCACHE}/tink_streams/0.3.3/github/aa8a05f7a82e5b881ae3bf8df4aa219bd56fec0f/src
 -D tink_streams=0.3.3
