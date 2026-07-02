@@ -13,14 +13,11 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          # - windows-latest
+          - windows-latest
           - macos-latest
         haxe-version:
           - stable
           - nightly
-        tink_core:
-          - v1
-          - master
         target:
           - interp
           - node
@@ -49,8 +46,6 @@ jobs:
 
       - name: Install Haxe Libraries
         run: lix download
-
-      - run: lix +tink 'core#${{ matrix.tink_core }}'
 
       - name: Run Test
         run: lix run travix ${{ matrix.target }}
